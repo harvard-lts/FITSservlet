@@ -63,5 +63,11 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/wordperfect_adapter_1_0.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/xml_adapter_1_0.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/xmlunit-1.2.jar"/>
+	<classpathentry kind="lib" path="/Users/Dave/Downloads/servlet-api-2.5.jar"/>
+	<classpathentry kind="lib" path="lib/apache/fluent-hc-4.3.5.jar"/>
+	<classpathentry kind="lib" path="lib/apache/httpclient-4.3.5.jar"/>
+	<classpathentry kind="lib" path="lib/apache/httpclient-cache-4.3.5.jar"/>
+	<classpathentry kind="lib" path="lib/apache/httpcore-4.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/apache/httpmime-4.3.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
