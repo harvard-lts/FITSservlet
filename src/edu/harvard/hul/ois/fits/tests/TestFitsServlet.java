@@ -1,17 +1,7 @@
 package edu.harvard.hul.ois.fits.tests;
 
-
 import java.net.*; 
 import java.io.*; 
-
-import javax.net.ssl.SSLPeerUnverifiedException;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.util.EntityUtils;
 
 public class TestFitsServlet {
 	  
