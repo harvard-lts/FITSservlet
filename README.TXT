@@ -14,6 +14,8 @@ The local fits.xml controls the tools a user wants to use
 
 Calling the servlet:
 
+Basic example:
+
 	public static void main (String args[]) { 
 		
         String urlLocal = "http://localhost:8080/fits_service/FitsService";
