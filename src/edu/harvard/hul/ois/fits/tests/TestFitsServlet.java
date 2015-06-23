@@ -10,8 +10,8 @@ public class TestFitsServlet {
         String urlLocal = "http://localhost:8080/fits_service/FitsService";
         String urlProd = "http://remark.hul.harvard.edu:10574/fits_service/FitsService";
         
-        String localFilePath = "/Users/Dave/Desktop/PERSONAL/CreditFreeze.png";
-        String serverFilePath = "/home/users/dsiegel/brady.jpg";
+        String localFilePath = "/Users/Freeze.png";
+        String serverFilePath = "/home/users/des/brady.jpg";
         
         try {
             
