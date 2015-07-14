@@ -162,7 +162,7 @@ public class FitsServlet_2 extends HttpServlet {
 
       	  // Send it to the FITS processor...
   	      String filePath = request.getParameter("file");
-  	      System.out.println("picked up file=" + filePath);
+  	      //System.out.println("picked up file=" + filePath);
   	      
             try {
           	  
