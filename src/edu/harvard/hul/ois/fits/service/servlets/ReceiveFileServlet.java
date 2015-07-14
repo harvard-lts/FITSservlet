@@ -13,7 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * This servlet demonstrates how to receive file uploaded from the client
- * without using third-party upload library such as Commons File Upload.
+ * without using third-party upload library such as Commons File Upload. It
+ * is here for reference only.
  * @author www.codejava.net
  */
 public class ReceiveFileServlet extends HttpServlet {

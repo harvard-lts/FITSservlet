@@ -64,8 +64,16 @@ public class FitsServlet_2 extends HttpServlet {
 
     }
     
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+    /**
+     * Handles the HTTP
+     * <code>GET</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 	  
 	  // Just pass it along
     	this.doPost(req, resp);
@@ -73,7 +81,13 @@ public class FitsServlet_2 extends HttpServlet {
     }
     
     /**
-     * handles file upload via HTTP POST method
+     * Handles the HTTP, and file upload for FITS processing
+     * <code>POST</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     	
