@@ -6,8 +6,11 @@ import static edu.harvard.hul.ois.fits.service.common.Constants.FITS_RESOURCE_PA
 import static edu.harvard.hul.ois.fits.service.common.Constants.FITS_RESOURCE_PATH_VERSION;
 
 import java.io.*;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
+import javax.naming.InitialContext;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.xml.bind.JAXBContext;
@@ -23,6 +26,7 @@ import edu.harvard.hul.ois.fits.service.pool.FitsWrapperFactory;
 import edu.harvard.hul.ois.fits.service.pool.FitsWrapperPool;
 import edu.harvard.hul.ois.fits.Fits;
 import edu.harvard.hul.ois.fits.FitsOutput;
+import edu.harvard.hul.ois.ots.schemas.XmlContent.XmlContent;
 
 // Extend HttpServlet class
 public class FitsServlet extends HttpServlet {
@@ -57,13 +61,13 @@ public class FitsServlet extends HttpServlet {
   }
   
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-	  
+	  	  
 	  // The FITS jar and it's dependencies would live in the servlet, and only the 'xml' and 'tools' 
-	  //directories would live externally in the FITS_HOME dir. When you initialize the Fits object you tell 
-	  //it where FITS_HOME is, and FITS reads the configuration and uses the tools at that path
+	  // directories would live externally in the FITS_HOME dir. When you initialize the Fits object you tell 
+	  // it where FITS_HOME is, and FITS reads the configuration and uses the tools at that path
 
   	  ErrorMessage errorMessage = null;
-	  Properties properties = new Properties();
+	  
 	  try {
 
 	    InputStream inStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("project.properties");
@@ -96,10 +100,10 @@ public class FitsServlet extends HttpServlet {
       
   }
   
+
   private void sendFitsExamineResponse(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
       String filePath = req.getParameter("file");
-      System.out.println("filePath..."+filePath+".... captured in sendFitsExamineResponse()");
       
       if (filePath == null) {
           ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_BAD_REQUEST, "Missing parameter " + FITS_FILE_PARAM, req.getRequestURL().toString());
