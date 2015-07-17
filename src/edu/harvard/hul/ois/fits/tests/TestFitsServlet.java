@@ -21,10 +21,7 @@ public class TestFitsServlet {
 		
 		TestFitsServlet http = new TestFitsServlet();
 		 
-		System.out.println("Testing Http GET request");
 		http.sendGet();
- 
-		//System.out.println("\nTesting Http POST request");
 		//http.sendPost();
 		
 	}
@@ -37,8 +34,8 @@ public class TestFitsServlet {
         String urlLocal = url; //"http://localhost:8080/FITSservlet/FitsServlet_2"; //"http://localhost:8080/fits_service/FitsService";
         String urlProd = "http://remark.hul.harvard.edu:10574/fits_service/FitsService";
 
-        String localFilePath = "/Users/Dave/Desktop/unnamed.png"; //"/Users/Freeze.png";
-        String serverFilePath = "/Users/Dave/Desktop/unnamed.png"; //"/home/users/des/brady.jpg";
+        String localFilePath = "/Users/Dave/Pictures/temp1.jpg"; //"/Users/Freeze.png";
+        String serverFilePath = "/Users/Dave/Pictures/temp1.jpg"; //"/home/users/des/brady.jpg";
  
 		HttpClient client = new DefaultHttpClient();
 		HttpPost post = new HttpPost(url);
@@ -79,7 +76,7 @@ public class TestFitsServlet {
         String urlProd = "http://remark.hul.harvard.edu:10574/fits_service/FitsService";
 
         String localFilePath = "/Users/Freeze.png";
-        String serverFilePath = "/Users/Dave/Desktop/unnamed.png"; //"/home/users/des/brady.jpg";
+        String serverFilePath = "/Users/Dave/Pictures/temp1.jpg"; //"/home/users/des/brady.jpg";
 
         try {
         	

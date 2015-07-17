@@ -99,6 +99,7 @@ public class FitsServlet_2 extends HttpServlet {
             remFile = true;
         } else if (request.getParameter("file") != null) {
         	isLocal = true;
+        	remFile = false;
         }
         
         ErrorMessage errorMessage = null;
@@ -177,7 +178,8 @@ public class FitsServlet_2 extends HttpServlet {
       	  // Send it to the FITS processor...
   	      String filePath = request.getParameter("file");
   	      //System.out.println("picked up file=" + filePath);
-  	      
+  	      remFile = false;
+  	    
             try {
           	  
                 sendFitsExamineResponse(filePath, request, response);
