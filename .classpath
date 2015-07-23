@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/commons-fileupload-1.3.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/droid"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6">
 		<attributes>
@@ -9,8 +10,10 @@
 	</classpathentry>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/fitsDS.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/AES31.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Users/Dave/Desktop/FITS/commons-fileupload-1.3.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/jdom.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/bfj220.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/bmp_adapter_1_0.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/commons-io-2.4.jar"/>
@@ -19,13 +22,11 @@
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/commons-pool2-2.4.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/excel_adapter_1_0.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/fast-md5.jar"/>
-	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/fits.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/gif_adapter_1_0.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/hclaps.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/html_adapter_1_0.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/jaxen-core.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/jaxen-jdom.jar"/>
-	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/jdom.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/jhove-handler.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/jhove-module.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/jhove.jar"/>
