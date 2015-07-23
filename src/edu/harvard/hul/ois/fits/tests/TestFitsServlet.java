@@ -44,6 +44,9 @@ public class TestFitsServlet {
 			commons-compress-1.4.1.jar			droid-report-interfaces-6.1.3.jar	tomcat-util.jar
 			commons-configuration-1.8.jar		droid-results-6.1.3.jar
 			commons-dbcp-1.4.jar				ecj-3.7.2.jar
+			*
+			* NOTE: There are still some log4j issues in stdout
+			* 
 		 */
 		
 		TestFitsServlet http = new TestFitsServlet();
