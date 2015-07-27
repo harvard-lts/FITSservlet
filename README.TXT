@@ -13,7 +13,26 @@ This application was developed and tested using Tomcat 7.
 
 Setup:
 
-There are 2 files to modify
+There are 3 files to modify
+
+catalina.properties -- in tomcat/conf
+
+All of the following .jar files should be placed in ./tomcat/shared/lib
+annotations-api.jar					commons-compress-1.4.1.jar		droid-container-6.1.3.jar
+antlr-2.7.7.jar						commons-configuration-1.8.jar	droid-core-6.1.3.jar
+antlr-3.2.jar						commons-dbcp-1.4.jar			droid-core-interfaces-6.1.3.jar
+antlr-runtime-3.2.jar				commons-digester-2.1.jar		droid-export-6.1.3.jar
+byteseek-1.1.1.jar					commons-httpclient-3.1.jar		droid-export-interfaces-6.1.3.jar
+commons-beanutils-1.8.3.jar			commons-io-2.4.jar				droid-help-6.1.3.jar
+commons-beanutils-core-1.8.3.jar	commons-lang-2.6.jar			droid-report-6.1.3.jar
+commons-cli-1.2.jar					commons-logging-1.1.1.jar		droid-report-interfaces-6.1.3.jar
+commons-codec-1.4.jar				commons-pool-1.5.4.jar			droid-results-6.1.3.jar
+commons-collections-3.2.1.jar		droid-command-line-6.1.3.jar
+
+Then, the catalina.properties file should have it's shared.loader property set to this location, either by using CATALINA_OPT or by full path:
+	
+	shared.loader=/usr/local/tomcat/shared/lib/*.jar
+
 
 web.xml-- Found in WEB-INF/
 project.properties -- Found in WEB-INF/classes

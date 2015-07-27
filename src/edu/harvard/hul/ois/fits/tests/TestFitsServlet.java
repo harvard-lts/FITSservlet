@@ -24,26 +24,21 @@ public class TestFitsServlet {
 		 * You really need to correct the class path in the manifest to handle this issue.
 		 * Replace the new fits.jar (fitsDS.jar) with the original fits.jar in the serlvet deployment.
 		 * 
-		 * All of these had to be in ../tomcat/lib since the classpath is not set correctly in
-		 * the .war
+		 * All of these jar files must be explicitly set on the classpath. For development, these were
+		 * put in /usr/local/tomcat/shared/bin and the catalina.properties file was modified so that
+		 * the shared.loader parameter pointed to them.
 		 * 
-		 * annotations-api.jar					commons-digester-2.1.jar			el-api.jar
-			antlr-2.7.7.jar						commons-httpclient-3.1.jar			jasper-el.jar
-			antlr-3.2.jar						commons-io-2.4.jar					jasper.jar
-			antlr-runtime-3.2.jar				commons-lang-2.6.jar				jsp-api.jar
-			byteseek-1.1.1.jar					commons-logging-1.1.1.jar			log4j-1.2.16.jar
-			catalina-ant.jar					commons-pool-1.5.4.jar				servlet-api.jar
-			catalina-ha.jar						droid-command-line-6.1.3.jar		solr-velocity-4.4.0.jar
-			catalina-tribes.jar					droid-container-6.1.3.jar			tomcat-api.jar
-			catalina.jar						droid-core-6.1.3.jar				tomcat-coyote.jar
-			commons-beanutils-1.8.3.jar			droid-core-interfaces-6.1.3.jar		tomcat-dbcp.jar
-			commons-beanutils-core-1.8.3.jar	droid-export-6.1.3.jar				tomcat-i18n-es.jar
-			commons-cli-1.2.jar					droid-export-interfaces-6.1.3.jar	tomcat-i18n-fr.jar
-			commons-codec-1.4.jar				droid-help-6.1.3.jar				tomcat-i18n-ja.jar
-			commons-collections-3.2.1.jar		droid-report-6.1.3.jar				tomcat-jdbc.jar
-			commons-compress-1.4.1.jar			droid-report-interfaces-6.1.3.jar	tomcat-util.jar
-			commons-configuration-1.8.jar		droid-results-6.1.3.jar
-			commons-dbcp-1.4.jar				ecj-3.7.2.jar
+		 * 	annotations-api.jar					commons-compress-1.4.1.jar		droid-container-6.1.3.jar
+			antlr-2.7.7.jar						commons-configuration-1.8.jar	droid-core-6.1.3.jar
+			antlr-3.2.jar						commons-dbcp-1.4.jar			droid-core-interfaces-6.1.3.jar
+			antlr-runtime-3.2.jar				commons-digester-2.1.jar		droid-export-6.1.3.jar
+			byteseek-1.1.1.jar					commons-httpclient-3.1.jar		droid-export-interfaces-6.1.3.jar
+			commons-beanutils-1.8.3.jar			commons-io-2.4.jar				droid-help-6.1.3.jar
+			commons-beanutils-core-1.8.3.jar	commons-lang-2.6.jar			droid-report-6.1.3.jar
+			commons-cli-1.2.jar					commons-logging-1.1.1.jar		droid-report-interfaces-6.1.3.jar
+			commons-codec-1.4.jar				commons-pool-1.5.4.jar			droid-results-6.1.3.jar
+			commons-collections-3.2.1.jar		droid-command-line-6.1.3.jar
+
 			*
 			* NOTE: There are still some log4j issues in stdout
 			* 
@@ -51,8 +46,8 @@ public class TestFitsServlet {
 		
 		TestFitsServlet http = new TestFitsServlet();
 		 
-		http.sendGet();
-		//http.sendPost();
+		//http.sendGet();
+		http.sendPost();
 		
 	}
 	
