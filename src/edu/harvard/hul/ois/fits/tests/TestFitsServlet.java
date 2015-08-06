@@ -55,15 +55,15 @@ public class TestFitsServlet {
 	// HTTP POST request
 	private void sendPost() throws Exception {
  
-		String url = "http://localhost:8080/FITSservlet/FitsServlet_2";
+		String url = " http://localhost:8080/FITSservlet/FitsServlet_2";
         String urlLocal = url; //"http://localhost:8080/FITSservlet/FitsServlet_2"; //"http://localhost:8080/fits_service/FitsService";
         String urlProd = "http://remark.hul.harvard.edu:10574/fits_service/FitsService";
 
-        String localFilePath = "/Users/Dave/Pictures/temp1.jpg"; //"/Users/Freeze.png";
-        String serverFilePath = "/Users/Dave/Pictures/temp1.jpg"; //"/home/users/des/brady.jpg";
+        String localFilePath = "/Users/Dave/Desktop/PERSONAL/unnamed.jpg"; //"/Users/Freeze.png";
+        String serverFilePath = "/Users/Dave/Desktop/PERSONAL/unnamed.jpg"; //"/home/users/des/brady.jpg";
  
 		HttpClient client = new DefaultHttpClient();
-		HttpPost post = new HttpPost(url);
+		HttpPost post = new HttpPost(url.trim());
  
 		// add header
 		post.setHeader("User-Agent", USER_AGENT);
