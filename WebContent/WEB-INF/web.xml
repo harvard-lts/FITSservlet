@@ -12,6 +12,7 @@
   <servlet>
     <servlet-name>FitsServlet</servlet-name>
     <servlet-class>edu.harvard.hul.ois.fits.service.servlets.FitsServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>FitsServlet</servlet-name>

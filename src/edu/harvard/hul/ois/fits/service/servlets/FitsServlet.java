@@ -1,46 +1,57 @@
 package edu.harvard.hul.ois.fits.service.servlets;
 
 import static edu.harvard.hul.ois.fits.service.common.Constants.FITS_FILE_PARAM;
-import static edu.harvard.hul.ois.fits.service.common.Constants.FITS_PRODUCES_MIMETYPE;
-import static edu.harvard.hul.ois.fits.service.common.Constants.FITS_RESOURCE_PATH_EXAMINE;
-import static edu.harvard.hul.ois.fits.service.common.Constants.FITS_RESOURCE_PATH_VERSION;
+import static edu.harvard.hul.ois.fits.service.common.Constants.FITS_HOME_SYSTEM_PROP_NAME;
+import static edu.harvard.hul.ois.fits.service.common.Constants.TEXT_HTML_MIMETYPE;
+import static edu.harvard.hul.ois.fits.service.common.Constants.TEXT_PLAIN_MIMETYPE;
+import static edu.harvard.hul.ois.fits.service.common.Constants.TEXT_XML_MIMETYPE;
 
-import java.io.*;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 
-import javax.naming.InitialContext;
-import javax.servlet.*;
-import javax.servlet.http.*;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.apache.log4j.Logger;
 
+import edu.harvard.hul.ois.fits.FitsOutput;
 import edu.harvard.hul.ois.fits.service.common.ErrorMessage;
 import edu.harvard.hul.ois.fits.service.pool.FitsWrapper;
 import edu.harvard.hul.ois.fits.service.pool.FitsWrapperFactory;
 import edu.harvard.hul.ois.fits.service.pool.FitsWrapperPool;
-import edu.harvard.hul.ois.fits.Fits;
-import edu.harvard.hul.ois.fits.FitsOutput;
-import edu.harvard.hul.ois.ots.schemas.XmlContent.XmlContent;
 
-// Extend HttpServlet class
 public class FitsServlet extends HttpServlet {
  
   private FitsWrapperPool fitsWrapperPool;
-  private static final long serialVersionUID = 7410633585875958440L;
-  private static Logger LOG = Logger.getLogger(FitsServlet.class);
+  private static final long serialVersionUID = -8091319477831924496L;
+  private static Logger logger = Logger.getLogger(FitsServlet.class);
   private static String fitsHome = "";
-  private static String mimeType = "";
+  private static String responseContentMimeType = TEXT_XML_MIMETYPE;
   
   public void init() throws ServletException {
+	  
+	  // "fits.home" property set differently in Tomcat 7 and JBoss 7.
+	  // Tomcat: set in catalina.properties
+	  // JBoss: set as a command line value "-Dfits.home=<path/to/fits/home>
+	  logger.info(FITS_HOME_SYSTEM_PROP_NAME + ": " + System.getProperty(FITS_HOME_SYSTEM_PROP_NAME));
+	  fitsHome = System.getProperty(FITS_HOME_SYSTEM_PROP_NAME);
+	  
+	  if (StringUtils.isEmpty(fitsHome)) {
+		  logger.fatal(FITS_HOME_SYSTEM_PROP_NAME + " system property HAS NOT BEEN SET!!! This web application will not properly run.");
+		  throw new ServletException(FITS_HOME_SYSTEM_PROP_NAME + " system property HAS NOT BEEN SET!!! This web application will not properly run.");
+	  }
       
       // Do required initialization
-      LOG.debug("Initializing FITS pool");
+      logger.debug("Initializing FITS pool");
       
       GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
 	  int numObjectsInPool = 5;
@@ -49,7 +60,6 @@ public class FitsServlet extends HttpServlet {
 	  poolConfig.setTestOnBorrow(true);
 	  poolConfig.setBlockWhenExhausted(true);
 	  fitsWrapperPool = new FitsWrapperPool(new FitsWrapperFactory(), poolConfig);
-
   }
 
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -57,7 +67,6 @@ public class FitsServlet extends HttpServlet {
 	  
 	  // Just pass to doGet
 	  doGet(req, resp);
-	  
   }
   
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -67,26 +76,6 @@ public class FitsServlet extends HttpServlet {
 	  // it where FITS_HOME is, and FITS reads the configuration and uses the tools at that path
 
   	  ErrorMessage errorMessage = null;
-	  
-	  try {
-
-	    InputStream inStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("project.properties");
-	    Properties props = new Properties();
-	    props.load(inStream);
-	    fitsHome = props.getProperty("fits.home");
-	    mimeType = props.getProperty("out.mimetype");
-	    // Set for the Wrapper Pool
-	    System.setProperty("fits.home", fitsHome);
-
-	  } catch (IOException e) {
-		e.printStackTrace();
-	  }
-
-	  if (fitsHome == null) {
-          ErrorMessage fitsErrorMessage = new ErrorMessage(HttpServletResponse.SC_BAD_REQUEST, "Missing parameter " + FITS_FILE_PARAM, req.getRequestURL().toString());
-          sendErrorMessageResponse(fitsErrorMessage, resp);
-          return;
-	  }
 
 	  // Send it to the processor...
       try {
@@ -97,13 +86,12 @@ public class FitsServlet extends HttpServlet {
           errorMessage = new ErrorMessage(e.getMessage(), req.getRequestURL().toString(), e.getMessage());
           sendErrorMessageResponse(errorMessage, resp);
       }
-      
   }
   
 
   private void sendFitsExamineResponse(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-      String filePath = req.getParameter("file");
+      String filePath = req.getParameter(FITS_FILE_PARAM);
       
       if (filePath == null) {
           ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_BAD_REQUEST, "Missing parameter " + FITS_FILE_PARAM, req.getRequestURL().toString());
@@ -123,13 +111,13 @@ public class FitsServlet extends HttpServlet {
 	  FitsWrapper fitsWrapper = null;
 	  
 	  try {
-	      LOG.debug("Borrowing fits from pool");
+	      logger.debug("Borrowing fits from pool");
 	      fitsWrapper = fitsWrapperPool.borrowObject();
 	      
 	      // To validate the object
 	      //System.out.println("T/F. Is this object valid:  "+fitsWrapper.isValid());
 	      
-	      LOG.debug("Running FITS on " + file.getPath());
+	      logger.debug("Running FITS on " + file.getPath());
 	
 	      // Start the output process
 	      ByteArrayOutputStream outStream = new ByteArrayOutputStream();
@@ -137,36 +125,31 @@ public class FitsServlet extends HttpServlet {
 	      fitsOutput.addStandardCombinedFormat();
 	      fitsOutput.output(outStream);
 	      String outputString = outStream.toString();
-	      
-		      if (mimeType == null)
-		    	  mimeType = "text/html";
-		      
-		  resp.setContentType(mimeType);
+		  resp.setContentType(responseContentMimeType);
 	      PrintWriter out = resp.getWriter();
 	      out.println(outputString);
 	      
 	  } catch (Exception e){
-		  e.printStackTrace(); // remove later
+		  logger.error("Problem executing call...", e);
 	      ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,  "Fits examine failed", req.getRequestURL().toString(), e.getMessage());
 	      sendErrorMessageResponse(errorMessage, resp);
 	  } finally {
 	      if (fitsWrapper != null){
-	          LOG.debug("Returning FITS to pool");
+	          logger.debug("Returning FITS to pool");
 	          fitsWrapperPool.returnObject(fitsWrapper);
 	      }
 	  }
-      
   }  
   
   private void sendErrorMessageResponse(ErrorMessage errorMessage,  HttpServletResponse resp) throws IOException {
       String errorMessageStr = errorMessageToString(errorMessage);      
       PrintWriter out = resp.getWriter();
-      resp.setContentType("text/html");
+      resp.setContentType(TEXT_HTML_MIMETYPE);
       out.println(errorMessageStr);
   }
   
   private void sendFitsVersionResponse(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-      resp.setContentType(FITS_PRODUCES_MIMETYPE);
+      resp.setContentType(TEXT_PLAIN_MIMETYPE);
       PrintWriter out = resp.getWriter();
       out.println(FitsOutput.VERSION);
   }
@@ -183,10 +166,5 @@ public class FitsServlet extends HttpServlet {
           errorMessageStr =  errorMessage.toString();
       }
       return errorMessageStr;
-  }
-  
-  
-  public void destroy() {
-      // do nothing.
   }
 }

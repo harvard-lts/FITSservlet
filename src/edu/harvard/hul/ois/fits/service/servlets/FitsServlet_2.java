@@ -1,16 +1,17 @@
 package edu.harvard.hul.ois.fits.service.servlets;
 
 import static edu.harvard.hul.ois.fits.service.common.Constants.FITS_FILE_PARAM;
-import static edu.harvard.hul.ois.fits.service.common.Constants.FITS_PRODUCES_MIMETYPE;
+import static edu.harvard.hul.ois.fits.service.common.Constants.FITS_HOME_SYSTEM_PROP_NAME;
+import static edu.harvard.hul.ois.fits.service.common.Constants.TEXT_HTML_MIMETYPE;
+import static edu.harvard.hul.ois.fits.service.common.Constants.TEXT_PLAIN_MIMETYPE;
+import static edu.harvard.hul.ois.fits.service.common.Constants.TEXT_XML_MIMETYPE;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -20,9 +21,10 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import org.apache.commons.fileupload.*;
+import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.apache.log4j.Logger;
 
@@ -38,11 +40,11 @@ import edu.harvard.hul.ois.fits.service.pool.FitsWrapperPool;
  */
 public class FitsServlet_2 extends HttpServlet {
  
+	private static final long serialVersionUID = 7485524766400256957L;
     private FitsWrapperPool fitsWrapperPool;
-    private static final long serialVersionUID = 7410633585875958440L;
-    private static Logger LOG = Logger.getLogger(FitsServlet.class);
+    private static Logger logger = Logger.getLogger(FitsServlet.class);
     private static String fitsHome = "";
-    private static String mimeType = "";
+    private static String responseContentMimeType = TEXT_XML_MIMETYPE;
     private static boolean remFile = false;
 
     private static final String UPLOAD_DIRECTORY = "upload";
@@ -53,7 +55,18 @@ public class FitsServlet_2 extends HttpServlet {
     
     public void init() throws ServletException {
         
-      LOG.debug("Initializing FITS pool");
+  	  // "fits.home" property set differently in Tomcat 7 and JBoss 7.
+  	  // Tomcat: set in catalina.properties
+  	  // JBoss: set as a command line value "-Dfits.home=<path/to/fits/home>
+  	  logger.info(FITS_HOME_SYSTEM_PROP_NAME + ": " + System.getProperty(FITS_HOME_SYSTEM_PROP_NAME));
+  	  fitsHome = System.getProperty(FITS_HOME_SYSTEM_PROP_NAME);
+  	  
+  	  if (StringUtils.isEmpty(fitsHome)) {
+  		  logger.fatal(FITS_HOME_SYSTEM_PROP_NAME + " system property HAS NOT BEEN SET!!! This web application will not properly run.");
+  		  throw new ServletException(FITS_HOME_SYSTEM_PROP_NAME + " system property HAS NOT BEEN SET!!! This web application will not properly run.");
+  	  }
+
+  	  logger.debug("Initializing FITS pool");
       GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
   	  int numObjectsInPool = 5;
   	  poolConfig.setMinIdle(numObjectsInPool);
@@ -61,7 +74,6 @@ public class FitsServlet_2 extends HttpServlet {
   	  poolConfig.setTestOnBorrow(true);
   	  poolConfig.setBlockWhenExhausted(true);
   	  fitsWrapperPool = new FitsWrapperPool(new FitsWrapperFactory(), poolConfig);
-
     }
     
     /**
@@ -77,7 +89,6 @@ public class FitsServlet_2 extends HttpServlet {
 	  
 	  // Just pass it along
     	this.doPost(req, resp);
-	  
     }
     
     /**
@@ -97,7 +108,7 @@ public class FitsServlet_2 extends HttpServlet {
         if (ServletFileUpload.isMultipartContent(request)) {
             isStream = true;
             remFile = true;
-        } else if (request.getParameter("file") != null) {
+        } else if (request.getParameter(FITS_FILE_PARAM) != null) {
         	isLocal = true;
         	remFile = false;
         }
@@ -124,12 +135,12 @@ public class FitsServlet_2 extends HttpServlet {
 	         
 	        try {
 
-	            List formItems = upload.parseRequest(request);
-	            Iterator iter = formItems.iterator();
+	            List<FileItem> formItems = upload.parseRequest(request);
+	            Iterator<FileItem> iter = formItems.iterator();
 	             
 	            // iterates over form's fields
 	            while (iter.hasNext()) {
-	                FileItem item = (FileItem) iter.next();
+	                FileItem item = iter.next();
 	                
 	                // processes only fields that are not form fields
 	                //if (!item.isFormField()) {
@@ -176,8 +187,7 @@ public class FitsServlet_2 extends HttpServlet {
         } else if (isLocal) {
 
       	  // Send it to the FITS processor...
-  	      String filePath = request.getParameter("file");
-  	      //System.out.println("picked up file=" + filePath);
+  	      String filePath = request.getParameter(FITS_FILE_PARAM);
   	      remFile = false;
   	    
             try {
@@ -195,26 +205,6 @@ public class FitsServlet_2 extends HttpServlet {
      * Send the local "file=xxx" to get examined by FITS
      */
 	private void sendFitsExamineResponse(String filePath, HttpServletRequest req, HttpServletResponse resp) throws IOException {
-
-    	  try {
-
-        	    InputStream inStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("project.properties");
-        	    Properties props = new Properties();
-        	    props.load(inStream);
-        	    fitsHome = props.getProperty("fits.home");
-        	    mimeType = props.getProperty("out.mimetype");
-        	    // Set for the Wrapper Pool
-        	    System.setProperty("fits.home", fitsHome);
-
-        	  } catch (IOException e) {
-        		e.printStackTrace();
-        	  }
-
-        	  if (fitsHome == null) {
-                  ErrorMessage fitsErrorMessage = new ErrorMessage(HttpServletResponse.SC_BAD_REQUEST, "Missing parameter " + FITS_FILE_PARAM, req.getRequestURL().toString());
-                  sendErrorMessageResponse(fitsErrorMessage, resp);
-                  return;
-        	  }
 	      
 	      if (filePath == null) {
 	          ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_BAD_REQUEST, "Missing parameter " + FITS_FILE_PARAM, req.getRequestURL().toString());
@@ -234,13 +224,13 @@ public class FitsServlet_2 extends HttpServlet {
 		  FitsWrapper fitsWrapper = null;
 		  
 		  try {
-		      LOG.debug("Borrowing fits from pool");
+		      logger.debug("Borrowing fits from pool");
 		      fitsWrapper = fitsWrapperPool.borrowObject();
 		      
 		      // To validate the object
 		      //System.out.println("T/F. Is this object valid:  "+fitsWrapper.isValid());
 		      
-		      LOG.debug("Running FITS on " + file.getPath());
+		      logger.debug("Running FITS on " + file.getPath());
 		
 		      // Start the output process
 		      ByteArrayOutputStream outStream = new ByteArrayOutputStream();
@@ -248,11 +238,7 @@ public class FitsServlet_2 extends HttpServlet {
 		      fitsOutput.addStandardCombinedFormat();
 		      fitsOutput.output(outStream);
 		      String outputString = outStream.toString();
-		      
-			      if (mimeType == null)
-			    	  mimeType = "text/html";
-			      
-			  resp.setContentType(mimeType);
+			  resp.setContentType(responseContentMimeType);
 		      PrintWriter out = resp.getWriter();
 		      out.println(outputString);
 		      
@@ -262,7 +248,7 @@ public class FitsServlet_2 extends HttpServlet {
 		      sendErrorMessageResponse(errorMessage, resp);
 		  } finally {
 		      if (fitsWrapper != null){
-		          LOG.debug("Returning FITS to pool");
+		          logger.debug("Returning FITS to pool");
 		          fitsWrapperPool.returnObject(fitsWrapper);
 		      }
 		  }
@@ -273,9 +259,9 @@ public class FitsServlet_2 extends HttpServlet {
 			  try{
 				  
 		    		if(file.delete()){
-		    			LOG.debug(file.getName() + " is deleted!");
+		    			logger.debug(file.getName() + " is deleted!");
 		    		} else {
-		    			LOG.debug(file.getName() + " could not be deleted!");
+		    			logger.debug(file.getName() + " could not be deleted!");
 		    		}
 		 
 		    	} catch(Exception e) {
@@ -288,12 +274,12 @@ public class FitsServlet_2 extends HttpServlet {
 	  private void sendErrorMessageResponse(ErrorMessage errorMessage,  HttpServletResponse resp) throws IOException {
 	      String errorMessageStr = errorMessageToString(errorMessage);      
 	      PrintWriter out = resp.getWriter();
-	      resp.setContentType("text/html");
+	      resp.setContentType(TEXT_HTML_MIMETYPE);
 	      out.println(errorMessageStr);
 	  }
 	  
 	  private void sendFitsVersionResponse(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-	      resp.setContentType(FITS_PRODUCES_MIMETYPE);
+	      resp.setContentType(TEXT_PLAIN_MIMETYPE);
 	      PrintWriter out = resp.getWriter();
 	      out.println(FitsOutput.VERSION);
 	  }

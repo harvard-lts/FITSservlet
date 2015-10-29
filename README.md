@@ -1,22 +1,22 @@
 
 FITS Servlet Usage Notes
 
-The FITS application itself is accessed via this servlet application. The servlet application is deployed as a web archive (.war). In Tomcat, a war 
+The FITS application itself is accessed via this servlet application. The servlet application is deployed as a web archive (.war). In Tomcat 7, a WAR file 
 is dropped into the /webapps directory. Tomcat uncompresses the .war and deploys the application under a directory as the same name as the .war. The
-actual name of the service that's called is defined in web.xml. The port that the servlet is accessed is controlled independantly of this application.
-To run the FITS servlet you must have two directories from the FITS application deployed on the same machine as the FITS servlet. However, only the
-XML and TOOLS directories are needed. The FITS servlet .war is deployed with the latest FITS version, and associated .jar files.
-
+actual name of the service that's called is defined in web.xml. The port that the servlet is accessed is controlled independently of this application.
+To run the FITS servlet you must have unpacked the FITS application zip file to the file system. In Tomcat the conf/catalina.properties file must be modified
+to indicate this location. The following both sets the FITS location as well as adding it lib/*.jar files to the Tomcat shared class loader. NOTE: The JAR files
+in the FITS lib/ subdirectories are added programmatically. Do not add them in the catalina.properties file.
 
 This application was developed and tested using Tomcat 7.
 
-
 Setup:
+Modify <Tomcat Home>/conf/catalina.properties by adding the following to the end of the file:
+# FITS properties
+fits.home=/path/to/FITS/installation
+# (copied 'shared.loader' from above to add to the shared classpath)
+shared.loader=${fits.home}/lib/*.jar
 
-There are 2 files to modify
-
-web.xml-- Found in WEB-INF/
-project.properties -- Found in WEB-INF/classes
 
 web.xml controls the deployment aspects of the servlet. Specifically, the servlet name as seen by the servlet container.
 
