@@ -1,3 +1,5 @@
+Eclipse (and other IDE's) it will be necessary to resolve reference to classes in the FITS project.
+At runtime these references will be resolved via Tomcat classpath and JBoss module additions.
 
 FITS Servlet Usage Notes
 
