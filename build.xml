@@ -1,0 +1,48 @@
+<?xml version="1.0" ?> 
+<project name="FITServlet" default="war">
+
+	<!-- Compile classpath depends on external fits.jar from FITS project. Set accordingly. -->
+	<property name="fits.jar.location" location="../fits/lib"/>
+	<property name="classes.dir" location="WebContent/WEB-INF/classes"/>
+	<property name="dist.dir" location="dist"/>
+
+    <path id="compile.classpath">
+        <fileset dir="WebContent/WEB-INF/lib">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="lib">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="lib/apache">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${fits.jar.location}">
+            <include name="fits.jar"/>
+        </fileset>
+    </path>
+    
+    <target name="init" depends="clean">
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${dist.dir}" />
+    </target>
+    
+    <target name="compile" depends="init">
+        <javac destdir="${classes.dir}" debug="true" srcdir="src" includeantruntime="false" source="1.7" target="1.7">
+            <classpath refid="compile.classpath"/>
+        </javac>
+    </target>
+    
+    <target name="war" depends="compile">
+        <war destfile="dist/FITServlet.war" webxml="WebContent/WEB-INF/web.xml">
+            <fileset dir="WebContent"/>
+            <lib dir="WebContent/WEB-INF/lib"/>
+            <classes dir="${classes.dir}"/>
+        </war>
+    </target>
+    
+    <target name="clean">
+        <delete  dir="${dist.dir}" />
+        <delete dir="${classes.dir}" />
+    </target>
+    
+</project>
