@@ -1,48 +1,92 @@
 <?xml version="1.0" ?> 
 <project name="FITServlet" default="war">
 
-	<!-- Compile classpath depends on external fits.jar from FITS project. Set accordingly. -->
-	<property name="fits.jar.location" location="../fits/lib"/>
-	<property name="classes.dir" location="WebContent/WEB-INF/classes"/>
-	<property name="dist.dir" location="dist"/>
+	<!--
+	     Compile classpath depends on external fits.jar from FITS project.
+	     Set value for property "fits.jar.location" accordingly in this properties file.
+	 -->
+	<property file="fits-location.properties" />
+	
+	<!-- ===================== Version properties file =========================== -->
+
+    <property file="version.properties" description="Should contain property 'build.version'" />
+	    
+	<!-- ==================== File and Directory Names ======================== -->
+
+	<property name="app.name"              value="FITServlet" />
+	<property name="app.longName"          value="File Information Toolset Servlet" /> 
+	<property name="jar.name"              value="${app.name}.jar" />
+	<property name="manifest.name"         value="MANIFEST.MF" />
+	<property name="manifest.dir"          location="WebContent/META-INF" />
+	<property name="src.dirs"              location="src" />
+	<property name="classes.dir"           location="WebContent/WEB-INF/classes" />
+	<property name="dist.dir"              location="dist" />
 
     <path id="compile.classpath">
         <fileset dir="WebContent/WEB-INF/lib">
-            <include name="*.jar"/>
+            <include name="*.jar" />
         </fileset>
         <fileset dir="lib">
-            <include name="*.jar"/>
+            <include name="*.jar" />
         </fileset>
         <fileset dir="lib/apache">
-            <include name="*.jar"/>
+            <include name="*.jar" />
         </fileset>
         <fileset dir="${fits.jar.location}">
-            <include name="fits.jar"/>
+            <include name="fits.jar" />
         </fileset>
     </path>
     
     <target name="init" depends="clean">
-        <mkdir dir="${classes.dir}"/>
+    	<echo message="Looking for fits.jar here: ${fits.jar.location}" />
+    	<fail message="fits.jar is missing -- cannot build.">
+    	    <condition>
+    	        <not>
+    	            <resourcecount count="1">
+    	                <fileset dir="${fits.jar.location}" includes="fits.jar" />
+    	            </resourcecount>
+    	        </not>
+    	    </condition>
+    	</fail>
+        <mkdir dir="${classes.dir}" />
         <mkdir dir="${dist.dir}" />
     </target>
     
     <target name="compile" depends="init">
-        <javac destdir="${classes.dir}" debug="true" srcdir="src" includeantruntime="false" source="1.7" target="1.7">
-            <classpath refid="compile.classpath"/>
+        <javac destdir="${classes.dir}" debug="true" srcdir="${src.dirs}" includeantruntime="false" source="1.7" target="1.7">
+            <classpath refid="compile.classpath" />
         </javac>
     </target>
     
     <target name="war" depends="compile">
-        <war destfile="dist/FITServlet.war" webxml="WebContent/WEB-INF/web.xml">
-            <fileset dir="WebContent"/>
-            <lib dir="WebContent/WEB-INF/lib"/>
-            <classes dir="${classes.dir}"/>
+    	<antcall target="create-manifest" />
+        <war destfile="dist/FITServlet.war" webxml="WebContent/WEB-INF/web.xml"
+        	manifest="${manifest.dir}/${manifest.name}">
+            <fileset dir="WebContent" />
+            <lib dir="WebContent/WEB-INF/lib" /> 
         </war>
     </target>
     
     <target name="clean">
         <delete  dir="${dist.dir}" />
         <delete dir="${classes.dir}" />
+        <delete file="${manifest.dir}/${manifest.name}" failonerror="false" />
+    </target>
+
+    <target name="create-manifest" description="Create the manifest for the jar file">
+        <tstamp>
+            <format property="timestamp.isoformat" pattern="yyyy-MM-dd'T'HH:mm:ss" />
+        </tstamp>
+        <property name="build.timestamp" value="${timestamp.isoformat}" />
+        <property name="build.date" value="${TODAY}" />
+    
+        <manifest file="${manifest.dir}/${manifest.name}">
+            <attribute name="Application-Name" value="${app.longName}" />
+            <attribute name="Specification-Version" value="${build.version}" />
+            <attribute name="Implementation-Vendor" value="OIS Harvard University Library" />
+            <attribute name="Build-Date" value="${build.date}" />
+            <attribute name="Build-Timestamp" value="${build.timestamp}" />
+        </manifest>
     </target>
     
 </project>
