@@ -13,9 +13,9 @@
 	    
 	<!-- ==================== File and Directory Names ======================== -->
 
-	<property name="app.name"              value="FITServlet" />
+	<property name="app.name"              value="FITSservlet" />
 	<property name="app.longName"          value="File Information Toolset Servlet" /> 
-	<property name="jar.name"              value="${app.name}.jar" />
+	<property name="war.name"              value="${app.name}.war" />
 	<property name="manifest.name"         value="MANIFEST.MF" />
 	<property name="manifest.dir"          location="WebContent/META-INF" />
 	<property name="src.dirs"              location="src" />
@@ -60,7 +60,7 @@
     
     <target name="war" depends="compile">
     	<antcall target="create-manifest" />
-        <war destfile="dist/FITServlet.war" webxml="WebContent/WEB-INF/web.xml"
+        <war destfile="${dist.dir}/${war.name}" webxml="WebContent/WEB-INF/web.xml"
         	manifest="${manifest.dir}/${manifest.name}">
             <fileset dir="WebContent" />
             <lib dir="WebContent/WEB-INF/lib" /> 
