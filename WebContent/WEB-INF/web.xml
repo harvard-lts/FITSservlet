@@ -16,14 +16,15 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>FitsServlet</servlet-name>
-    <url-pattern>/FitsServlet</url-pattern>
+    <url-pattern>/FitsService</url-pattern>
   </servlet-mapping>
+  
   <servlet>
     <servlet-name>FitsServlet_2</servlet-name>
     <servlet-class>edu.harvard.hul.ois.fits.service.servlets.FitsServlet_2</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>FitsServlet_2</servlet-name>
-    <url-pattern>/FitsServlet_2</url-pattern>
+    <url-pattern>/FitsService_2</url-pattern>
   </servlet-mapping>
 </web-app>
