@@ -1,6 +1,3 @@
-* [FITS Servlet Usage Notes](#servlet-usage)
-
-
 Eclipse (and other IDE's) it will be necessary to resolve reference to classes in the FITS project.
 At runtime these references will be resolved via Tomcat classpath and JBoss module additions.
 
@@ -22,7 +19,6 @@ fits.home=/path/to/FITS/installation
 # (copied 'shared.loader' from above to add to the shared classpath)
 shared.loader=${fits.home}/lib/*.jar
 
-<a name="servlet-usage"></a>FITS Servlet Usage Notes
 
 web.xml controls the deployment aspects of the servlet. Specifically, the servlet name as seen by the servlet container.
 
