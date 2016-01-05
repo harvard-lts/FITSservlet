@@ -156,7 +156,10 @@ public class FitsServlet_2 extends HttpServlet {
 	                    	                    
 	                    // In case the file didn't make it
 	                    if (!storeFile.exists()) {
-	                        errorMessage = new ErrorMessage("Error in upload file.", request.getRequestURL().toString(), " Unspecified.");
+	                        errorMessage = new ErrorMessage(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+	                        		"Error in upload file.",
+	                        		request.getRequestURL().toString(),
+	                        		" Unspecified.");
 	                        sendErrorMessageResponse(errorMessage, response);
 	                    }
 	                        // Send it to the FITS processor...
@@ -165,11 +168,17 @@ public class FitsServlet_2 extends HttpServlet {
 		                        sendFitsExamineResponse(storeFile.getAbsolutePath(), request, response);
 	
 		                    } catch (Exception e){
-		                        errorMessage = new ErrorMessage(e.getMessage(), request.getRequestURL().toString(), e.getMessage());
+		                        errorMessage = new ErrorMessage(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+		                        		e.getMessage(),
+		                        		request.getRequestURL().toString(),
+		                        		e.getMessage());
 		                        sendErrorMessageResponse(errorMessage, response);
 		                    }
 	                } else {
-                        errorMessage = new ErrorMessage("The request did not have the correct name attribute of \"datafile\" in the form processing. ", request.getRequestURL().toString(), " Processing halted.");
+                        errorMessage = new ErrorMessage(HttpServletResponse.SC_BAD_REQUEST,
+                        		"The request did not have the correct name attribute of \"datafile\" in the form processing. ",
+                        		request.getRequestURL().toString(),
+                        		" Processing halted.");
                         sendErrorMessageResponse(errorMessage, response);
 	                }
 	                
@@ -195,7 +204,10 @@ public class FitsServlet_2 extends HttpServlet {
                 sendFitsExamineResponse(filePath, request, response);
 
             } catch (Exception e){
-                errorMessage = new ErrorMessage(e.getMessage(), request.getRequestURL().toString(), e.getMessage());
+                errorMessage = new ErrorMessage(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                		e.getMessage(),
+                		request.getRequestURL().toString(),
+                		e.getMessage());
                 sendErrorMessageResponse(errorMessage, response);
             }
         }
@@ -207,7 +219,9 @@ public class FitsServlet_2 extends HttpServlet {
 	private void sendFitsExamineResponse(String filePath, HttpServletRequest req, HttpServletResponse resp) throws IOException {
 	      
 	      if (filePath == null) {
-	          ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_BAD_REQUEST, "Missing parameter " + FITS_FILE_PARAM, req.getRequestURL().toString());
+	          ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_BAD_REQUEST,
+	        		  "Missing parameter: " + FITS_FILE_PARAM,
+	        		  req.getRequestURL().toString());
 	          sendErrorMessageResponse(errorMessage, resp);
 	          return;
 	      }
@@ -215,7 +229,9 @@ public class FitsServlet_2 extends HttpServlet {
 	      File file = new File(filePath);
 	      
 	      if (!file.exists()) {
-	          ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_BAD_REQUEST,  "Bad parameter value for " + FITS_FILE_PARAM + ": " + file.getCanonicalPath(), " " + req.getRequestURL().toString());
+	          ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_BAD_REQUEST,
+	        		  "Bad parameter value for " + FITS_FILE_PARAM + ": " + file.getCanonicalPath(),
+	        		  " " + req.getRequestURL().toString());
 	          sendErrorMessageResponse(errorMessage, resp);
 	          return;
 	      }
@@ -244,7 +260,10 @@ public class FitsServlet_2 extends HttpServlet {
 		      
 		  } catch (Exception e){
 			  e.printStackTrace(); // remove later
-		      ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,  "Fits examine failed", req.getRequestURL().toString(), e.getMessage());
+		      ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+		    		  "Fits examine failed",
+		    		  req.getRequestURL().toString(),
+		    		  e.getMessage());
 		      sendErrorMessageResponse(errorMessage, resp);
 		  } finally {
 		      if (fitsWrapper != null){
@@ -265,7 +284,10 @@ public class FitsServlet_2 extends HttpServlet {
 		    		}
 		 
 		    	} catch(Exception e) {
-		  		      ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,  "Fits examine failed", req.getRequestURL().toString(), e.getMessage());
+		  		      ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+		  		    		  "Fits examine failed",
+		  		    		  req.getRequestURL().toString(),
+		  		    		  e.getMessage());
 				      sendErrorMessageResponse(errorMessage, resp);
 		    	}
 		  }
@@ -275,6 +297,7 @@ public class FitsServlet_2 extends HttpServlet {
 	      String errorMessageStr = errorMessageToString(errorMessage);      
 	      PrintWriter out = resp.getWriter();
 	      resp.setContentType(TEXT_HTML_MIMETYPE);
+	      resp.setStatus(errorMessage.getStatusCode());
 	      out.println(errorMessageStr);
 	  }
 	  

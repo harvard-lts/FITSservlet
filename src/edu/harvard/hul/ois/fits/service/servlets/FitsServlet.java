@@ -83,7 +83,10 @@ public class FitsServlet extends HttpServlet {
           sendFitsExamineResponse(req, resp);
 
       } catch (Exception e){
-          errorMessage = new ErrorMessage(e.getMessage(), req.getRequestURL().toString(), e.getMessage());
+          errorMessage = new ErrorMessage(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+        		  e.getMessage(),
+        		  req.getRequestURL().toString(),
+        		  e.getMessage());
           sendErrorMessageResponse(errorMessage, resp);
       }
   }
@@ -94,7 +97,9 @@ public class FitsServlet extends HttpServlet {
       String filePath = req.getParameter(FITS_FILE_PARAM);
       
       if (filePath == null) {
-          ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_BAD_REQUEST, "Missing parameter " + FITS_FILE_PARAM, req.getRequestURL().toString());
+          ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_BAD_REQUEST,
+        		  "Missing parameter: " + FITS_FILE_PARAM, 
+        		 req.getRequestURL().toString());
           sendErrorMessageResponse(errorMessage, resp);
           return;
       }
@@ -102,7 +107,9 @@ public class FitsServlet extends HttpServlet {
       File file = new File(filePath);
       
       if (!file.exists()) {
-          ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_BAD_REQUEST,  "Bad parameter value for " + FITS_FILE_PARAM + ": " + file.getCanonicalPath(), req.getRequestURL().toString());
+          ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_BAD_REQUEST,
+        		  "Bad parameter value for " + FITS_FILE_PARAM + ": " + file.getCanonicalPath(),
+        		  req.getRequestURL().toString());
           sendErrorMessageResponse(errorMessage, resp);
           return;
       }
@@ -131,7 +138,10 @@ public class FitsServlet extends HttpServlet {
 	      
 	  } catch (Exception e){
 		  logger.error("Problem executing call...", e);
-	      ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,  "Fits examine failed", req.getRequestURL().toString(), e.getMessage());
+	      ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+	    		  "Fits examine failed",
+	    		  req.getRequestURL().toString(),
+	    		  e.getMessage());
 	      sendErrorMessageResponse(errorMessage, resp);
 	  } finally {
 	      if (fitsWrapper != null){
@@ -145,6 +155,7 @@ public class FitsServlet extends HttpServlet {
       String errorMessageStr = errorMessageToString(errorMessage);      
       PrintWriter out = resp.getWriter();
       resp.setContentType(TEXT_HTML_MIMETYPE);
+      resp.setStatus(errorMessage.getStatusCode());
       out.println(errorMessageStr);
   }
   
