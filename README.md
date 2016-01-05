@@ -140,4 +140,3 @@ Here is a basic example of calling the service in Java from a sample client appl
             }
         }
     }
-
