@@ -5,66 +5,134 @@
 	     Compile classpath depends on external fits.jar from FITS project.
 	     Set value for property "fits.jar.location" accordingly in this properties file.
 	 -->
-	<property file="fits-location.properties" />
+	<property file="build.properties" />
+	<property environment="env"/> <!-- access to environment properties -->
+	<!--
+	   Access to FITS classes in fits.jar is necessary for compile resolution.
+	   The environment variable "fits_jar_location" can be set to point to the
+	   location containing fits.jar.
+	 -->
+	<property name="fits.jar.environment.location" location="${env.fits_jar_location}" />
+
 	
 	<!-- ===================== Version properties file =========================== -->
-
-    <property file="version.properties" description="Should contain property 'build.version'" />
+    <property name="build.version.file" value="version.properties"/>
+    <property file="${build.version.file}" />
 	    
 	<!-- ==================== File and Directory Names ======================== -->
 
-	<property name="app.name"              value="FITSservlet" />
-	<property name="app.longName"          value="File Information Toolset Servlet" /> 
-	<property name="war.name"              value="${app.name}.war" />
+	<property name="app.name"              value="fits" />
+	<property name="app.longName"          value="File Information Toolset Web Service" /> 
+	<property name="war.name"              value="${app.name}-${build.version}.war" />
 	<property name="manifest.name"         value="MANIFEST.MF" />
 	<property name="manifest.dir"          location="WebContent/META-INF" />
 	<property name="src.dirs"              location="src" />
 	<property name="classes.dir"           location="WebContent/WEB-INF/classes" />
 	<property name="dist.dir"              location="dist" />
-
-    <path id="compile.classpath">
-        <fileset dir="WebContent/WEB-INF/lib">
-            <include name="*.jar" />
-        </fileset>
-        <fileset dir="lib">
-            <include name="*.jar" />
-        </fileset>
-        <fileset dir="lib/apache">
-            <include name="*.jar" />
-        </fileset>
-        <fileset dir="${fits.jar.location}">
-            <include name="fits.jar" />
-        </fileset>
-    </path>
     
     <target name="init" depends="clean">
-    	<echo message="Looking for fits.jar here: ${fits.jar.location}" />
-    	<fail message="fits.jar is missing -- cannot build.">
+
+        <!-- Set property if environment path to fits.jar exists -->
+    	<available property="fits.jar.environment.location.exists" file="${fits.jar.environment.location}/fits.jar" />
+        <!-- Set property if fall-back path to fits.jar exists -->
+        <available property="fits.jar.fallback.location.exists" file="${fits.jar.fallback.location}/fits.jar" />
+
+    	<!-- uncomment for property debugging information
+    	<echo>fits.jar.environment.location: ${env.fits_jar_location}</echo>
+    	<echo>fits.jar.fallback.location: ${fits.jar.fallback.location}</echo>
+        <echo>fits.jar.environment.location: ${fits.jar.environment.location}</echo>
+    	<echo>fits.jar.environment.location.exists: ${fits.jar.environment.location.exists}</echo>
+        <echo>fits.jar.fallback.location.exists: ${fits.jar.fallback.location.exists}</echo>
+    	-->
+
+    	<!-- Ensure at least one of two possible locations point to fits.jar for compilation -->
+        <fail message="fits.jar is missing from 2 possible locations -- cannot build.">
     	    <condition>
-    	        <not>
-    	            <resourcecount count="1">
-    	                <fileset dir="${fits.jar.location}" includes="fits.jar" />
-    	            </resourcecount>
-    	        </not>
+        	    <and>
+        	    	<not>
+        	    	    <isset property="fits.jar.environment.location.exists"/>
+        	    	</not>
+                    <not>
+                        <isset property="fits.jar.fallback.location.exists"/>
+                    </not>
+                </and>
     	    </condition>
     	</fail>
+    	
+    	<!-- Set property for fits.jar based on environment property first, then internal fall-back if it doesn't exist. -->
+    	<available property="fits.jar.location" file="${fits.jar.environment.location}/fits.jar" value="${fits.jar.environment.location}/fits.jar" />
+    	<!-- (only set property if previous one doesn't exist) -->
+    	<property name="fits.jar.fallback" value="${basedir}/${fits.jar.fallback.location}/fits.jar" />
+        <condition property="fits.jar.location" value="${fits.jar.fallback}">
+        	<not>
+        		<isset property="fits.jar.environment.location.exists" />
+        	</not>
+        </condition>
+    	
+    	<echo message="Using fit.jar located here: ${fits.jar.location}" />
+    	
+    	<!-- Verify existance of version properties file containing the expected property. -->
+    	<fail message="Cannot find file: ${build.version.file}">
+    		<condition>
+    			<not>
+                    <resourcecount count="1">
+                        <fileset dir="." includes="${build.version.file}" />
+                    </resourcecount>
+    			</not>
+    		</condition>
+    	</fail>
+    	<fail message="Property 'build.version' not found in file ${build.version.file}">
+    		<condition>
+    			<not>
+    			    <isset property="build.version" />
+    			</not>
+   			</condition>
+   		</fail>
+    	
         <mkdir dir="${classes.dir}" />
         <mkdir dir="${dist.dir}" />
     </target>
     
     <target name="compile" depends="init">
         <javac destdir="${classes.dir}" debug="true" srcdir="${src.dirs}" includeantruntime="false" source="1.7" target="1.7">
-            <classpath refid="compile.classpath" />
+        	<classpath>
+                <fileset dir="WebContent/WEB-INF/lib">
+                    <include name="*.jar" />
+                </fileset>
+        		<!-- need the following to compile test classes -->
+                <fileset dir="lib">
+                    <include name="*.jar" />
+                </fileset>
+        		<pathelement location="${fits.jar.location}" />
+        	</classpath>
         </javac>
     </target>
     
     <target name="war" depends="compile">
     	<antcall target="create-manifest" />
+    	<!-- Put logging configuration file into the classes directory -->
+    	<copy file="WebContent/WEB-INF/log4j.properties" todir="${classes.dir}" />
         <war destfile="${dist.dir}/${war.name}" webxml="WebContent/WEB-INF/web.xml"
         	manifest="${manifest.dir}/${manifest.name}">
             <fileset dir="WebContent" />
             <lib dir="WebContent/WEB-INF/lib" /> 
         </war>
+    </target>
+	
+	<!-- Must set environment variable CATALINA_HOME for location to deploy WAR file. -->
+	<!-- For Eclipse set an environment variable from any task's "Ant build..." -->
+    <target name="deploy-to-tomcat"  description="Deploy the WAR file to Tomcat at server location.">
+    	<fail unless="env.CATALINA_HOME" message="CATALINA_HOME not set. Cannot deploy ${war.name}."/>
+        <copy file="${dist.dir}/${war.name}"
+        	todir="${env.CATALINA_HOME}/webapps"></copy>
+    	<echo message="${war.name} deployed to ${env.CATALINA_HOME}/webapps" />
+    </target>
+
+    <target name="undeploy-from-tomcat" description="Undeploy the WAR file from Tomcat.">
+        <fail unless="env.CATALINA_HOME" message="CATALINA_HOME not set. Cannot undeploy ${war.name}."/>
+		<available file="${env.CATALINA_HOME}/webapps/${war.name}" property="war.file.found"/>
+    	<fail unless="war.file.found" message="${env.CATALINA_HOME}/webapps/${war.name} does not exist." />
+    	<delete file="${env.CATALINA_HOME}/webapps/${war.name}" />
     </target>
     
     <target name="clean">
@@ -73,7 +141,7 @@
         <delete file="${manifest.dir}/${manifest.name}" failonerror="false" />
     </target>
 
-    <target name="create-manifest" description="Create the manifest for the jar file">
+    <target name="create-manifest">
         <tstamp>
             <format property="timestamp.isoformat" pattern="yyyy-MM-dd'T'HH:mm:ss" />
         </tstamp>

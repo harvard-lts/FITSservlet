@@ -1,4 +1,4 @@
-package edu.harvard.hul.ois.fits.tests;
+package edu.harvard.hul.ois.fits.clients;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,8 +15,9 @@ import java.net.URL;
  * @author www.codejava.net
  *
  */
+@Deprecated // The POST access of the Servlet will only handle form data.
 public class NonFormFileUploader {
-    static final String UPLOAD_URL = "http://localhost:8080/CodeWeb/ReceiveFileServlet";
+    static final String UPLOAD_URL = "http://localhost:8080/fits-1.1.0/examine";
     static final int BUFFER_SIZE = 4096;
  
     public static void main(String[] args) throws IOException {
@@ -33,7 +34,7 @@ public class NonFormFileUploader {
         httpConn.setDoOutput(true);
         httpConn.setRequestMethod("POST");
         // sets file name as a HTTP header
-        httpConn.setRequestProperty("fileName", uploadFile.getName());
+        httpConn.setRequestProperty("datafile", uploadFile.getName());
  
         // opens output stream of the HTTP connection for writing data
         OutputStream outputStream = httpConn.getOutputStream();

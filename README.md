@@ -1,21 +1,37 @@
-The FITS Servlet is a project that allows FITS to be deployed as a service on either Tomcat or JBoss.
+The FITS Web Service is a project that allows FITS to be deployed as a service on either Tomcat or JBoss.
 (It has been tested on Tomcat 7 and minimally tested on JBoss 7.1.)
 
-* [FITS Servlet Usage Notes](#servlet-usage)
+* [FITS Web Service Usage Notes](#servlet-usage)
 * [Deploying to Tomcat](#tomcat)
 * [Deploying to JBoss](#jboss)
 * [IDE Notes](#ide-notes)
 * [Test Client](#test-client)
 
-# <a name="servlet-usage"></a>FITS Servlet Usage Notes
+# <a name="servlet-usage"></a>FITS Web Service Usage Notes
 This project requires the installation of [FITS](http://fitstool.org).
 Download FITS from the [download](http://projects.iq.harvard.edu/fits/downloads) page and unpack the zip file to a directory on the server.
 
-In order to run the FITS Servlet on a server it’s necessary to modify the server’s classpath configuration to add FITS JAR files. Essentially, this mean adding the FITS home directory to the server’s classpath since FITS can (and should) be deployed to a location outside the server.
+In order to run the FITS Web Service on a server it’s necessary to modify the server’s classpath configuration to add FITS JAR files. Essentially, this mean adding the FITS home directory to the server’s classpath since FITS can (and should) be deployed to a location outside the server. See below for how to do this in Tomcat and JBoss.
 
-The name of the Java class is edu.harvard.hul.ois.fits.service.servlets.FitsServlet and is referenced in the servlet container as:
-    `http://yourserver.yourdomain.com:<port>/<project name>/FitsService`
-See [below](#test-client) for a usage example.
+The WAR file built by the source code or available on the [FITS](http://fitstool.org) website contains the version number. It may be desirable to shorten this file name by removing the version number or just renaming the path to the application within the application server used to deploy the application. Note: The application version is contained within the WAR file's MANIFEST.MF file.
+Here is an example of the base URL for accessing this application without modification to the WAR file:
+    `http://yourserver.yourdomain.com:<port>/fits-1.0.1/<url-pattern>`
+The `<url-pattern>` is what following to access the actual service.
+
+## API
+There are currently two services provided by the web applciation.
+1. Examining a file and returning corresponding metadata containing both FITS output and standard schema output in XML format. (See [FITS](http://fitstool.org) for more information.)
+    Substitute 'examine' for `<url-pattern>` (see above) plus add a 'file' parameter name with the path to the input file for a GET request or submit a POST request with form data with a 'file' parameter name containing the contents of the file as its payload.
+    'FitsService' will also work in place of 'examine' but this path is being deprecated and will be removed at some future point.
+    Examples:
+        GET (could be from a browser or using curl) `http://yourserver.yourdomain.com:<port>/fits-1.0.1/examine?file=path/to/file`
+        POST `curl -i --data-urlencode file=path/to/file http://yourserver.yourdomain.com:<port>/fits-1.0.1/examine`
+2. The version of FITS being used to examine input files returned in plain text format.
+    Substitute 'version' for `<url-pattern>` (see above).
+    Example:
+        GET (could be from a browser or using curl) `http://yourserver.yourdomain.com:<port>/<project name>/version`
+        
+See [below](#test-client) for a Java test client example.
 
 # <a name="tomcat"></a>Deploying to Tomcat 7
 ## Add Entries to catalina.properties
@@ -33,7 +49,7 @@ Add the following to the bottom of the file:
 Within the WAR file’s META-INF directory is a Tomcat-specific file, context.xml. This file indicates to the Tomcat server to modify the Tomcat default class loader scheme for this application. The result is that, rather than load the WAR’s classes and JAR files first, classes on Tomcat’s shared classpath will be loaded first. This is critical given the nature of the custom class loaders used in FITS. (This file will be ignored if deploying to JBoss.)
 
 # <a name="jboss"></a>Deploying to JBoss 7.1
-Setting up the FITS Servlet within JBoss is somewhat more involved due to the more complex nature of JBoss class isolation.
+Setting up the FITS Web Service within JBoss is somewhat more involved due to the more complex nature of JBoss class isolation.
 ## Setting Environment Variable ‘fits.home’
 This can be one in one of two ways:
 1. Set environment variable on command line.
@@ -140,3 +156,4 @@ Here is a basic example of calling the service in Java from a sample client appl
             }
         }
     }
+

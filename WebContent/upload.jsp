@@ -9,7 +9,7 @@
 </head>
 <body>
     <center>
-        <form method="post" action="FitsServlet_2" enctype="multipart/form-data">
+        <form method="post" action="examine" enctype="multipart/form-data">
             Select file to upload: <input type="file" name="datafile" />
             <br/><br/>
             <input type="submit" value="Upload" />
