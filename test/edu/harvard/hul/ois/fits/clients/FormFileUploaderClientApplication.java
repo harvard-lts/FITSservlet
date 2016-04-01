@@ -22,25 +22,34 @@ import org.apache.log4j.Logger;
 
 /**
  * This program is a test client to upload files to a web server using HTTP POST.
+ * Modify the endpoint URL as well as the path to the file for uploading.
  * 
- * @author www.codejava.net
- *
+ * @author dan179
  */
 public class FormFileUploaderClientApplication {
-	static final String UPLOAD_URL = "http://localhost:8080/fits-1.1.0/examine";
-	static final int BUFFER_SIZE = 4096;
-	static String localFilePath = "/Users/dan179/Documents/FITS-WP-test/input-holding/My_Word_Doc.doc";
-	
+	private static String serverUrl = "http://localhost:8080/fits-1.1.0/examine"; // default value - override with args[1]
 	private static Logger logger = null;
+
+	private static final String LOG4J_PROPERTIES_FILE = "tests.log4j.properties";
 	
 	static {
-        File log4jProperties = new File("tests.log4j.properties");
-        System.out.println("File exists: " + log4jProperties.exists());
-        URI log4jUri = log4jProperties.toURI();
-        System.setProperty( "log4j.configuration", log4jUri.toString());
+        File log4jProperties = new File(LOG4J_PROPERTIES_FILE); // looks to load test log4j properties file first.
+        System.out.println(LOG4J_PROPERTIES_FILE + " -- File exists: " + log4jProperties.exists());
+        if (log4jProperties.exists()) {
+        	URI log4jUri = log4jProperties.toURI();
+        	System.setProperty("log4j.configuration", log4jUri.toString());
+        }
+        String log4jProp = System.getProperty("log4j.configuration");
+        System.out.println("log4j.configuration: " + log4jProp);
+        // else should set log4j properties file from environment variable either in Eclipse of command line with -Dlog4j.configuration=<some location>
         logger = Logger.getLogger(FormFileUploaderClientApplication.class);
     }
 
+	/**
+	 * Run the program.
+	 * 
+	 * @param args First argument is path to the file to analyze; second (optional) is path to server for overriding default value.
+	 */
 	public static void main(String[] args) {
 		// takes file path from first program's argument
 		if (args.length < 1) {
@@ -56,12 +65,16 @@ public class FormFileUploaderClientApplication {
 			logger.error("===== Exiting Program =====");
 			System.exit(1);
 		}
+		
+		if (args.length > 1) {
+			serverUrl = args[1];
+		}
 
 		logger.info("File to upload: " + filePath);
 		
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		try {
-			HttpPost httppost = new HttpPost(UPLOAD_URL);
+			HttpPost httppost = new HttpPost(serverUrl);
 			FileBody bin = new FileBody(uploadFile);
 			HttpEntity reqEntity = MultipartEntityBuilder.create().addPart(FITS_FORM_FIELD_DATAFILE, bin).build();
 			httppost.setEntity(reqEntity);

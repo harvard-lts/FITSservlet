@@ -99,6 +99,7 @@ public class FitsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
       
         String servletPath = request.getServletPath(); // gives servlet mapping
+        logger.info("Entering doGet(): " + servletPath);
         
         // See if path is just requesting version number. If so, just return it.
         if (FITS_RESOURCE_PATH_VERSION.equals(servletPath)) {
@@ -133,6 +134,7 @@ public class FitsServlet extends HttpServlet {
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+    	logger.info("Entering doPost()");
         if (!ServletFileUpload.isMultipartContent(request)) {
             ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_BAD_REQUEST,
                     " Missing Multipart Form Data. ",
@@ -310,7 +312,9 @@ public class FitsServlet extends HttpServlet {
       }
       
       private void sendErrorMessageResponse(ErrorMessage errorMessage,  HttpServletResponse resp) throws IOException {
-          String errorMessageStr = errorMessageToString(errorMessage);      
+          String errorMessageStr = errorMessageToString(errorMessage);
+          logger.error("Error -- Status:" + errorMessage.getStatusCode() + " - " +
+        		  errorMessage.getReasonPhrase() + ", " + errorMessage.getMessage());
           PrintWriter out = resp.getWriter();
           resp.setContentType(TEXT_HTML_MIMETYPE);
           resp.setStatus(errorMessage.getStatusCode());

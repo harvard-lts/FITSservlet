@@ -27,6 +27,7 @@
 	<property name="manifest.name"         value="MANIFEST.MF" />
 	<property name="manifest.dir"          location="WebContent/META-INF" />
 	<property name="src.dirs"              location="src" />
+    <property name="test.dirs"             location="test" />
 	<property name="classes.dir"           location="WebContent/WEB-INF/classes" />
 	<property name="dist.dir"              location="dist" />
     
@@ -94,7 +95,7 @@
     </target>
     
     <target name="compile" depends="init">
-        <javac destdir="${classes.dir}" debug="true" srcdir="${src.dirs}" includeantruntime="false" source="1.7" target="1.7">
+        <javac destdir="${classes.dir}" debug="true" srcdir="${src.dirs}:${test.dirs}" includeantruntime="false" source="1.7" target="1.7">
         	<classpath>
                 <fileset dir="WebContent/WEB-INF/lib">
                     <include name="*.jar" />
