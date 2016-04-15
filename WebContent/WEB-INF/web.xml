@@ -3,28 +3,20 @@
   <display-name>FITSservlet</display-name>
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
-    <welcome-file>index.htm</welcome-file>
-    <welcome-file>index.jsp</welcome-file>
-    <welcome-file>default.html</welcome-file>
-    <welcome-file>default.htm</welcome-file>
-    <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
+  <listener>
+    <description>Configures logging for this application</description>
+    <display-name>Logging Configuration</display-name>
+    <listener-class>edu.harvard.hul.ois.fits.service.listeners.LoggingConfigurator</listener-class>
+  </listener>
   <servlet>
     <servlet-name>FitsServlet</servlet-name>
     <servlet-class>edu.harvard.hul.ois.fits.service.servlets.FitsServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
+    <load-on-startup>0</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>FitsServlet</servlet-name>
-    <url-pattern>/FitsService</url-pattern>
-  </servlet-mapping>
-  
-  <servlet>
-    <servlet-name>FitsServlet_2</servlet-name>
-    <servlet-class>edu.harvard.hul.ois.fits.service.servlets.FitsServlet_2</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>FitsServlet_2</servlet-name>
-    <url-pattern>/FitsService_2</url-pattern>
+    <url-pattern>/examine</url-pattern>
+    <url-pattern>/version</url-pattern>
   </servlet-mapping>
 </web-app>
