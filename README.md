@@ -105,8 +105,8 @@ Within the WAR file’s WEB-INF directory is a JBoss-specific file, jboss-deploy
 
 Additional JBoss information can be found here: https://developer.jboss.org/thread/219956?tstart=0
 
-## <a name="ide-notes"></a>IDE Notes
-For Eclipse and other IDE's it will be necessary to resolve reference to classes in the FITS project. When adding this project to an IDE for development the FITS project should also be added and referenced. The Ant `build.xml` file will attempt to resolve a configured location for fits.jar and fallback to default location. One of these two must be satisfied for a successful build. See the `build.xml` file for more details.
+## <a name="ide-notes"></a>IDE Notes 
+For Eclipse and other IDE's it will be necessary to resolve reference to classes in the FITS project. When adding this project to an IDE for development the FITS project should also be added and referenced. The Ant `build.xml` file will attempt to resolve an environment variable configured location for fits.jar, `fits_jar_location` or fallback to a default location as configured in `build.properties`. One of these two must be satisfied for a successful build. See the `build.xml` file for more details.
 At runtime in a server environment these references will be resolved via the Tomcat shared classpath or the JBoss module additions.
 
 ## <a name="test-client"></a>Test Client
