@@ -94,7 +94,7 @@
         <mkdir dir="${dist.dir}" />
     </target>
     
-    <target name="compile" depends="init">
+    <target name="compile" depends="init" description="Compile all source code">
         <javac destdir="${classes.dir}" debug="true" srcdir="${src.dirs}:${test.dirs}" includeantruntime="false" source="1.8" target="1.8">
         	<classpath>
                 <fileset dir="WebContent/WEB-INF/lib">
@@ -109,7 +109,7 @@
         </javac>
     </target>
     
-    <target name="war" depends="compile">
+    <target name="war" depends="compile" description="Build the WAR file">
     	<antcall target="create-manifest" />
     	<!-- Put logging configuration file into the classes directory -->
     	<copy file="WebContent/WEB-INF/log4j.properties" todir="${classes.dir}" />
@@ -122,21 +122,21 @@
 	
 	<!-- Must set environment variable CATALINA_HOME for location to deploy WAR file. -->
 	<!-- For Eclipse set an environment variable from any task's "Ant build..." -->
-    <target name="deploy-to-tomcat"  description="Deploy the WAR file to Tomcat at server location.">
+    <target name="deploy-to-tomcat"  description="Deploy the WAR file to Tomcat at (configured) server location.">
     	<fail unless="env.CATALINA_HOME" message="CATALINA_HOME not set. Cannot deploy ${war.name}."/>
         <copy file="${dist.dir}/${war.name}"
         	todir="${env.CATALINA_HOME}/webapps"></copy>
     	<echo message="${war.name} deployed to ${env.CATALINA_HOME}/webapps" />
     </target>
 
-    <target name="undeploy-from-tomcat" description="Undeploy the WAR file from Tomcat.">
+    <target name="undeploy-from-tomcat" description="Undeploy the WAR file from Tomcat at (configured) server location.">
         <fail unless="env.CATALINA_HOME" message="CATALINA_HOME not set. Cannot undeploy ${war.name}."/>
 		<available file="${env.CATALINA_HOME}/webapps/${war.name}" property="war.file.found"/>
     	<fail unless="war.file.found" message="${env.CATALINA_HOME}/webapps/${war.name} does not exist." />
     	<delete file="${env.CATALINA_HOME}/webapps/${war.name}" />
     </target>
     
-    <target name="clean">
+    <target name="clean" description="Clean the project">
         <delete  dir="${dist.dir}" />
         <delete dir="${classes.dir}" />
         <delete file="${manifest.dir}/${manifest.name}" failonerror="false" />

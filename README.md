@@ -18,17 +18,17 @@ In order to run the FITS Web Service on a server it’s necessary to modify the 
 The WAR file can be built from the source code using Ant. Alternatively it is available on the [FITS](http://fitstool.org/downloads#fits-servlet) website. Since the WAR file contains the version, it may be desirable to shorten this file name by removing this version number or just renaming the path to the application within the application server used to deploy the application. Note: The FITS Service version is contained within the WAR file's manifest file.
 Here is an example of the base URL for accessing this application without modification to the WAR file:
     `http://yourserver.yourdomain.com:<port>/fits/<endpoint>`
-Note: If you deploy the WAR file as fits-1.1.0.war then the URL examples contained here will need to contain `fits-1.1.0` instead of `fits`.
+Note: If you deploy the WAR file as fits-1.1.1.war (or whatever the version number happens to be then the URL examples contained here will need to contain `fits-1.1.1` instead of `fits`.
 The `<endpoint>` is one of the endpoints available within the FITS Service plus parameters to access the service.
 
 ### Endpoints
 There are currently two services provided by the web applciation.
-1. __/examine__ -- Examining a file and returning corresponding metadata containing both FITS output and standard schema output in XML format. (See [FITS](http://fitstool.org) for more information.)
+<br>1. __/examine__ -- Examining a file and returning corresponding metadata containing both FITS output and standard schema output in XML format. (See [FITS](http://fitstool.org) for more information.)
     Substitute 'examine' for `<endpoint>` (see above) plus add a 'file' parameter name with the path to the input file for a GET request or submit a POST request with form data with a 'file' parameter name containing the contents of the file as its payload.
 Examples:
         GET (could be from a browser or using curl) `http://yourserver.yourdomain.com:<port>/fits/examine?file=path/to/file`
         POST `curl -i --data-urlencode file=path/to/file http://yourserver.yourdomain.com:<port>/fits/examine`
-2. __/version__ -- Obtaining the version of FITS being used to examine input files returned in plain text format.
+<br>2. __/version__ -- Obtaining the version of FITS being used to examine input files returned in plain text format.
 Example:
         GET (could be from a browser or using curl) `http://yourserver.yourdomain.com:<port>/fits/version`
 ### Web Interface
@@ -42,17 +42,17 @@ See <a href="#test-client">below</a> for a Java test client example.
 ## <a name="tomcat"></a>Deploying to Tomcat 7 and Tomcat 8
 ### Add Entries to catalina.properties
 It’s necessary to add the location of the FITS directory to the file `$CATALINA_BASE/conf/catalina.properties` then add the FITS lib folder JAR files. (See example below.) 
-1. Add the “fits.home” environment variable.
-2. Add all “fits.home”/lib/ JAR files to the shared class loader classpath with a wildcard ‘*’ and the `${fits.home}` property substitution.
+<br>1. Add the “fits.home” environment variable.
+<br>2. Add all “fits.home”/lib/ JAR files to the shared class loader classpath with a wildcard ‘*’ and the `${fits.home}` property substitution.
 **Note: Do NOT add any JAR files that are contained in any of the FITS lib/ subdirectories to this classpath entry. They are added programmatically at runtime by the application.**
-3. (optional) Rather than using the default log4j.properties file located within the WAR file (which logs to a file within the Tomcat directory structure) it's possible to set up logging to point to an external log4j.properties file. Add a "log4j.configuration" property to catalina.properties pointing to this file. It can be either a full path or have the `file:` protocol at the beginning of the entry. This is managed by the class `edu.harvard.hul.ois.fits.service.listeners.LoggingConfigurator.java`
+<br>3. (optional) Rather than using the default log4j.properties file located within the WAR file (which logs to a file within the Tomcat directory structure) it's possible to set up logging to point to an external log4j.properties file. Add a "log4j.configuration" property to catalina.properties pointing to this file. It can be either a full path or have the `file:` protocol at the beginning of the entry. This is managed by the class `edu.harvard.hul.ois.fits.service.listeners.LoggingConfigurator.java`.
 #### catalina.properties example
 Add the following to the bottom of the file:
 `fits.home=path/to/fits/home'` (note: no final slash in path)
 `shared.loader=${fits.home}/lib/*.jar
-log4j.configuration=/Users/dan179/Documents/FITS/log4j.properties`
+log4j.configuration=/path/to/log4j.properties`
 or
-`log4j.configuration=file:/Users/dan179/Documents/FITS/log4j.properties`
+`log4j.configuration=file:/path/to/log4j.properties`
 #### Additional Information:
 **Class loading:** Within the WAR file’s META-INF directory is a Tomcat-specific file, context.xml. This file indicates to the Tomcat server to modify the Tomcat default class loader scheme for this application. The result is that, rather than load the WAR’s classes and JAR files first, classes on Tomcat’s shared classpath will be loaded first. This is critical given the nature of the custom class loaders used in FITS. (This file will be ignored if deploying to JBoss.)
 
