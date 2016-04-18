@@ -30,8 +30,13 @@ Examples:
         POST `curl -i --data-urlencode file=path/to/file http://yourserver.yourdomain.com:<port>/fits/examine`
 2. __/version__ -- Obtaining the version of FITS being used to examine input files returned in plain text format.
 Example:
-        GET (could be from a browser or using curl) `http://yourserver.yourdomain.com:<port>/<project name>/version`
-        
+        GET (could be from a browser or using curl) `http://yourserver.yourdomain.com:<port>/fits/version`
+### Web Interface
+There is also a web page with a form for uploading a file for FITS processing.
+It can be access from this URL:
+`http://yourserver.yourdomain.com:<port>/fits/upload.jsp`
+XML will be returned as a response.
+
 See <a href="#test-client">below</a> for a Java test client example.
 
 ## <a name="tomcat"></a>Deploying to Tomcat 7 and Tomcat 8
