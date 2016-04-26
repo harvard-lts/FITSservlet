@@ -23,15 +23,16 @@ The `<endpoint>` is one of the endpoints available within the FITS Service plus 
 
 ### Endpoints
 There are currently two services provided by the web applciation.
-<br>1. __/examine__ -- Examining a file and returning corresponding metadata containing both FITS output and standard schema output in XML format. (See [FITS](http://fitstool.org) for more information.)
+#### 1. /examine
+Examining a file and returning corresponding metadata containing both FITS output and standard schema output in XML format. (See [FITS](http://fitstool.org) for more information.)
     Substitute 'examine' for `<endpoint>` (see above) plus add a 'file' parameter name with the path to the input file for a GET request or submit a POST request with form data with a 'file' parameter name containing the contents of the file as its payload.
 <br>Examples: 
 * GET: (using curl) `curl --get -k --data-binary file=path/to/file http://yourserver.yourdomain.com:<port>/fits/examine`
 * GET: (using a browser) `http://yourserver.yourdomain.com:<port>/fits/examine?file=path/to/file`
 * POST: (using curl) `curl -k -F datafile file=path/to/file http://yourserver.yourdomain.com:<port>/fits/examine` ('datafile' is the required form parameter that points to the uploaded file.)
 * POST: (using a browser) `http://yourserver.yourdomain.com:<port>/fits/upload.jsp` (Select the file to upload then click the 'Upload' button.)
-<br>
-2. __/version__ -- Obtaining the version of FITS being used to examine input files returned in plain text format. (GET request only)
+#### 2. /version
+Obtaining the version of FITS being used to examine input files returned in plain text format. (GET request only)
 <br>Examples:
 * GET (using curl) `curl --get http://yourserver.yourdomain.com:<port>/fits/version`
 * GET (using a browser) `http://yourserver.yourdomain.com:<port>/fits/version`
