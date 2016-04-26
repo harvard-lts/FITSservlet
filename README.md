@@ -32,7 +32,6 @@ Examining a file and returning corresponding metadata containing both FITS outpu
 * POST: (using curl) `curl -k -F datafile file=path/to/file http://yourserver.yourdomain.com:<port>/fits/examine` ('datafile' is the required form parameter that points to the uploaded file.)
 * POST: (using a browser) `http://yourserver.yourdomain.com:<port>/fits/upload.jsp` (Select the file to upload then click the 'Upload' button.)
 
-<br>
 #### 2. /version
 Obtaining the version of FITS being used to examine input files returned in plain text format. (GET request only)
 <br>Examples:
