@@ -1,5 +1,10 @@
 Release Notes for FITS Service
 
+Version 1.1.1
+----------------------
+Updated documentation.
+Added 'description' attributes to a few Ant targets in build.xml.
+
 Version 1.1.0
 ----------------------
 Implement POST handling of streaming file upload from any location.

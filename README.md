@@ -11,7 +11,7 @@ The FITS Service is a project that allows [FITS](http://fitstool.org) to be depl
 ## <a name="servlet-usage"></a>FITS Web Service Usage Notes
 **This project requires the installation of [FITS](http://fitstool.org) minimum release v.0.9.0.**
 
-Download FITS from the [download](http://fitstool.org/downloads) page and unpack the zip file to a directory on the server. Take note of this directory.
+Download FITS (ZIP file) and FITS Service (WAR file) from the [download](http://fitstool.org/downloads) page and unpack the ZIP file to a directory on the server. Take note of this directory. The WAR file should be placed in the Tomcat 'webapps' directory.
 
 In order to run the FITS Web Service on a server it’s necessary to modify the server’s classpath configuration to add FITS JAR files. Essentially, this mean adding the FITS home directory to the server’s classpath since FITS can (and should) be deployed to a location outside the server. See below for how to do this in Tomcat and JBoss.
 
@@ -19,18 +19,24 @@ The WAR file can be built from the source code using Ant. Alternatively it is av
 Here is an example of the base URL for accessing this application without modification to the WAR file:
     `http://yourserver.yourdomain.com:<port>/fits/<endpoint>`
 Note: If you deploy the WAR file as fits-1.1.1.war (or whatever the version number happens to be then the URL examples contained here will need to contain `fits-1.1.1` instead of `fits`.
-The `<endpoint>` is one of the endpoints available within the FITS Service plus parameters to access the service.
+The `<endpoint>` is one of the endpoints available within the FITS Service plus parameters to access the service. Rename to fits.war before deploying to use the following examples.
 
 ### Endpoints
 There are currently two services provided by the web applciation.
-<br>1. __/examine__ -- Examining a file and returning corresponding metadata containing both FITS output and standard schema output in XML format. (See [FITS](http://fitstool.org) for more information.)
+#### 1. /examine
+Examining a file and returning corresponding metadata containing both FITS output and standard schema output in XML format. (See [FITS](http://fitstool.org) for more information.)
     Substitute 'examine' for `<endpoint>` (see above) plus add a 'file' parameter name with the path to the input file for a GET request or submit a POST request with form data with a 'file' parameter name containing the contents of the file as its payload.
-Examples:
-        GET (could be from a browser or using curl) `http://yourserver.yourdomain.com:<port>/fits/examine?file=path/to/file`
-        POST `curl -i --data-urlencode file=path/to/file http://yourserver.yourdomain.com:<port>/fits/examine`
-<br>2. __/version__ -- Obtaining the version of FITS being used to examine input files returned in plain text format.
-Example:
-        GET (could be from a browser or using curl) `http://yourserver.yourdomain.com:<port>/fits/version`
+<br>Examples: 
+* GET: (using curl) `curl --get -k --data-binary file=path/to/file http://yourserver.yourdomain.com:<port>/fits/examine`
+* GET: (using a browser) `http://yourserver.yourdomain.com:<port>/fits/examine?file=path/to/file`
+* POST: (using curl) `curl -k -F datafile file=path/to/file http://yourserver.yourdomain.com:<port>/fits/examine` ('datafile' is the required form parameter that points to the uploaded file.)
+* POST: (using a browser) `http://yourserver.yourdomain.com:<port>/fits/upload.jsp` (Select the file to upload then click the 'Upload' button.)
+
+#### 2. /version
+Obtaining the version of FITS being used to examine input files returned in plain text format. (GET request only)
+<br>Examples:
+* GET (using curl) `curl --get http://yourserver.yourdomain.com:<port>/fits/version`
+* GET (using a browser) `http://yourserver.yourdomain.com:<port>/fits/version`
 ### Web Interface
 There is also a web page with a form for uploading a file for FITS processing.
 It can be access from this URL:
