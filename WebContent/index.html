@@ -10,6 +10,7 @@
 
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-1.12.3.min.js" integrity="sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ=" crossorigin="anonymous"></script>
 <title>FITS Service</title>
 
 </head>
@@ -17,9 +18,11 @@
   <div class="container-fluid">
     <div class="jumbotron">
       <h1 class="text-center">FITS Web Service</h1>
+      <h2>FITS Version: <span id="fitsversion"></span></h2>
     </div>
   </div>
   <div class="container-fluid">
+    <!-- <h1>FITS Version: <span id="fitsversion"></span></h1> -->
     <h2>You may use our test upload function below:</h2>
     <form method="post" action="examine" enctype="multipart/form-data">
       <div class="row">
@@ -59,7 +62,7 @@
             <dd>Refers to a file which you will upload to FITS with full path</dd>
           </dl>
         </li>
-        <li><strong>Endpoint <code>/examine</code></strong><br/>
+        <li><strong>Endpoint: <code>/examine</code></strong><br/>
           Examining a file and returing the corresponding metadata containing both FITS output and standard schema output in XML
           format. (See FITS for more information.)
           <dl class="dl-horizontal">
