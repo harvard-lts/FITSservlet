@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta charset="UTF-8">
 <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
@@ -16,17 +17,16 @@
 
 <body>
   <div class="container-fluid">
-    <div class="jumbotron">
-      <h1 class="text-center">FITS Web Service</h1>
-      <h2 class="text-center">FITS Version: <span id="fitsversion"></span></h2>
+    <div class="jumbotron text-center">
+      <h1>FITS Web Service</h1>
+      <h2>FITS Version: <span id="fitsversion"></span></h2>
     </div>
   </div>
   <div class="container-fluid">
-    <!-- <h1>FITS Version: <span id="fitsversion"></span></h1> -->
     <h2>You may use our test upload function below:</h2>
     <form method="post" action="examine" enctype="multipart/form-data">
       <div class="row">
-        <div class="col-xs-4 col-xs-offset-4">
+        <div class="col-xs-10 col-xs-offset-1 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
           <fieldset>
             <div class="form-group" id="inputFileFormGroup">
               <label class="control-label" for="inputFile">Select file to upload:</label>
