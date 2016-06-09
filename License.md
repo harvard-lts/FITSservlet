@@ -7,8 +7,5 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.Copyright ©2016
 
-#### Additional Licenses
-Please note that packages included within FITS Servlet are packaged under their own licenses.
-
-For each package a license file is contained within the Licenses folder.  We are working to ensure
-proper linking to these source files as well within our updates to this package.
+#### Third Party Software Licenses
+We have included the license text for the packages we are using inside the License folder and any applicable notices required in the Notices folder.  A specific reference of each package will be added to this License file in the next release. 
