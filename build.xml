@@ -2,16 +2,13 @@
 <project name="FITServlet" default="war">
 
 	<!--
-	     Compile classpath depends on external fits.jar from FITS project.
-	     Set value for property "fits.jar.location" accordingly in this properties file.
+	     Compile classpath depends on finding an external fits.jar from FITS project.
+         The environment variable "fits_jar_location" can be set to point to the
+         location containing fits.jar. Alternatively, set the value for property "fits.jar.fallback.location"
+         in the following properties file.
 	 -->
 	<property file="build.properties" />
 	<property environment="env"/> <!-- access to environment properties -->
-	<!--
-	   Access to FITS classes in fits.jar is necessary for compile resolution.
-	   The environment variable "fits_jar_location" can be set to point to the
-	   location containing fits.jar.
-	 -->
 	<property name="fits.jar.environment.location" location="${env.fits_jar_location}" />
 
 	
@@ -33,44 +30,37 @@
     
     <target name="init" depends="clean">
 
-        <!-- Set property if environment path to fits.jar exists -->
-    	<available property="fits.jar.environment.location.exists" file="${fits.jar.environment.location}/fits.jar" />
-        <!-- Set property if fall-back path to fits.jar exists -->
-        <available property="fits.jar.fallback.location.exists" file="${fits.jar.fallback.location}/fits.jar" />
+    	<!-- Location of possible FITS JAR file as set by environment variable. -->
+    	<fileset dir="${fits.jar.environment.location}" includes="*.jar" id="fits.jar.environment">
+            <filename regex="fits.*\.jar" /> <!-- regex takes into account version number in JAR file. -->
+    	</fileset>
+    	<!-- Set property indicating number of FITS JAR files at environment variable location. -->
+        <resourcecount refid="fits.jar.environment" property="environ.fits.jar.count" />
 
+        <!-- Location of possible FITS JAR file as set by fallback location as set in properties file. -->
+        <fileset dir="${fits.jar.fallback.location}" includes="*.jar" id="fits.jar.fallback">
+            <filename regex="fits.*\.jar" /> <!-- regex takes into account version number in JAR file. -->
+        </fileset>
+        <!-- Set property indicating number of FITS JAR files at fallback location. -->
+        <resourcecount refid="fits.jar.fallback" property="fallback.fits.jar.count" />
+    	
     	<!-- uncomment for property debugging information
-    	<echo>fits.jar.environment.location: ${env.fits_jar_location}</echo>
-    	<echo>fits.jar.fallback.location: ${fits.jar.fallback.location}</echo>
-        <echo>fits.jar.environment.location: ${fits.jar.environment.location}</echo>
-    	<echo>fits.jar.environment.location.exists: ${fits.jar.environment.location.exists}</echo>
-        <echo>fits.jar.fallback.location.exists: ${fits.jar.fallback.location.exists}</echo>
+    	<echo message="fits.jar.environment.location: ${env.fits_jar_location}" />
+    	<echo message="fits.jar.fallback.location: ${fits.jar.fallback.location}" />
+    	<echo message="fits JAR files in environment variable location: ${environ.fits.jar.count}" />
+        <echo message="fits JAR files in fallback location: ${fallback.fits.jar.count}" />
     	-->
-
-    	<!-- Ensure at least one of two possible locations point to fits.jar for compilation -->
-        <fail message="fits.jar is missing from 2 possible locations -- cannot build.">
-    	    <condition>
-        	    <and>
-        	    	<not>
-        	    	    <isset property="fits.jar.environment.location.exists"/>
-        	    	</not>
-                    <not>
-                        <isset property="fits.jar.fallback.location.exists"/>
-                    </not>
-                </and>
-    	    </condition>
-    	</fail>
     	
-    	<!-- Set property for fits.jar based on environment property first, then internal fall-back if it doesn't exist. -->
-    	<available property="fits.jar.location" file="${fits.jar.environment.location}/fits.jar" value="${fits.jar.environment.location}/fits.jar" />
-    	<!-- (only set property if previous one doesn't exist) -->
-    	<property name="fits.jar.fallback" value="${basedir}/${fits.jar.fallback.location}/fits.jar" />
-        <condition property="fits.jar.location" value="${fits.jar.fallback}">
-        	<not>
-        		<isset property="fits.jar.environment.location.exists" />
-        	</not>
-        </condition>
-    	
-    	<echo message="Using fit.jar located here: ${fits.jar.location}" />
+    	<fail message="*** Either missing FITS JAR file or more than one is present. There should be one and only one FITS JAR file. Cannot build! ***">
+    		<condition>
+   				<not>
+   				    <xor>
+        				<equals arg1="${environ.fits.jar.count}" arg2="1" />
+                        <equals arg1="${fallback.fits.jar.count}" arg2="1" />
+   				    </xor>
+                </not>
+   			</condition>
+   		</fail>
     	
     	<!-- Verify existance of version properties file containing the expected property. -->
     	<fail message="Cannot find file: ${build.version.file}">
@@ -104,7 +94,9 @@
                 <fileset dir="lib">
                     <include name="*.jar" />
                 </fileset>
-        		<pathelement location="${fits.jar.location}" />
+        		<!-- Already determined that FITS JAR file will be in only one of the following two locations. -->
+        		<fileset refid="fits.jar.fallback" />
+                <fileset refid="fits.jar.environment" />
         	</classpath>
         </javac>
     </target>
@@ -116,7 +108,6 @@
         <war destfile="${dist.dir}/${war.name}" webxml="WebContent/WEB-INF/web.xml"
         	manifest="${manifest.dir}/${manifest.name}">
             <fileset dir="WebContent" />
-            <lib dir="WebContent/WEB-INF/lib" /> 
         </war>
     </target>
 	
