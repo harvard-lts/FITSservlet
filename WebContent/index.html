@@ -1,11 +1,96 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta charset="UTF-8">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+<!-- Latest compiled version of jQuery -->
+<script src="https://code.jquery.com/jquery-1.12.3.min.js" integrity="sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ=" crossorigin="anonymous"></script>
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
 <title>FITS Service</title>
 </head>
+
 <body>
-    <div>FITS Service</div>
-    <div>You may test processing a file <a href="upload.jsp">here</a></div>
+  <div class="container-fluid">
+    <div class="jumbotron text-center">
+      <h1>FITS Web Service</h1>
+      <h2>FITS Version: <span id="fitsversion"></span></h2>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <h2>You may use our test upload function below:</h2>
+    <form method="post" action="examine" enctype="multipart/form-data">
+      <div class="row">
+        <div class="col-xs-10 col-xs-offset-1 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
+          <fieldset>
+            <div class="form-group" id="inputFileFormGroup">
+              <label class="control-label" for="inputFile">Select file to upload:</label>
+              <input type="file" autofocus class="form-control" id="inputFile" name="datafile">
+            </div>
+            <div class="form-group">
+              <button class="btn btn-default" type="submit" id="submitButton">
+                <span aria-hidden="true" class="glyphicon glyphicon-log-in"></span>
+                Upload
+              </button>
+            </div>
+          </fieldset>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="container-fluid">
+    <h2>Basic Usage Details:</h2>
+    <p>For additional information please refer to the <a href="http://fitstool.org">FITS homepage</a>.
+      <ul>
+        <li><strong>Conventions Used In Examples:</strong><br/>
+          Below are the conventions we will be using within the examples given.
+          <dl class="dl-horizontal">
+            <dt>/fits</dt>
+            <dd>The context root is assumed to be /fits.  Your context root may be different depending on installation</dd>
+            <dt>HOST</dt>
+            <dd>Refers to your server where fits has been installed. </dd>
+            <dt>PORT</dt>
+            <dd>Refers to the port on which fits is running.</dd>
+            <dt>REMOTEFILE</dt>
+            <dd>Refers to the filename with full path on the FITS server to examine</dd>
+            <dt>LOCALFILE</dt>
+            <dd>Refers to a file which you will upload to FITS with full path</dd>
+          </dl>
+        </li>
+        <li><strong>Endpoint: <code>/examine</code></strong><br/>
+          Examining a file and returing the corresponding metadata containing both FITS output and standard schema output in XML
+          format. (See FITS for more information.)
+          <dl class="dl-horizontal">
+            <dt>GET (using curl):</dt>
+            <dd><code class="bg-info">curl --get -k --data-binary file=REMOTEFILE http://HOST:PORT/fits/examine</code></dd>
+            <dt>GET (using browser):</dt>
+            <dd><code class="bg-info">http://HOST:PORT/fits/examine?file=REMOTEFILE</code></dd>
+            <dt>POST (using curl):</dt>
+            <dd><code class="bg-info">curl -k -F datafile=LOCALFILE http://HOST:PORT/fits/examine</code></dd>
+            <dt>POST (using browser):</dt>
+            <dd><code class="bg-info">http://HOST:PORT/fits/index.html</code> Use the upload form.</dd>
+          </dl>
+        </li>
+        <li><strong>Endpoint: <code>/version</code></strong><br/>
+        Obtaining the version information for FITS being used to examine the input files returned in plain text format. (GET request only)
+        <dl class="dl-horizontal">
+          <dt>GET (using curl):</dt>
+          <dd><code class="bg-info">curl --get http://HOST:PORT/fits/version</code></dd>
+          <dt>GET (using browser)</dt>
+          <dd><code class="bg-info">http://HOST:PORT/fits/version</code></dd>
+        </dl>
+        <li><strong>Information</strong><br/>
+          The return of any fits call will be a structured XML.  If the file is properly identified this will be the FITS output, if there is an issue with the uploaded file an XML error response.
+        </li>
+      </ul>
+    </div>
+    <script>
+      $( "#fitsversion" ).load( "version" );
+    </script>
 </body>
 </html>
