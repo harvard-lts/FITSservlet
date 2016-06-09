@@ -4,7 +4,7 @@ Copyright ©2016 [The President and Fellows of Harvard College]
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+       (http://www.apache.org/licenses/LICENSE-2.0)
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,5 +16,4 @@ Copyright ©2016 [The President and Fellows of Harvard College]
 Please note that packages included within FITS Servlet are packaged under their own licenses.
 
 For each package a license file is contained within the Licenses folder.  We are working to ensure
-proper linking to these source files as well within our updates to this package. 
-
+proper linking to these source files as well within our updates to this package.
