@@ -1,3 +1,13 @@
+//
+// Copyright (c) 2016 by The President and Fellows of Harvard College
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License. You may obtain a copy of the License at:
+// http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software distributed under the License is
+// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permission and limitations under the License.
+//
+
 package edu.harvard.hul.ois.fits.clients;
 
 import static edu.harvard.hul.ois.fits.service.common.Constants.FITS_FORM_FIELD_DATAFILE;
@@ -23,7 +33,7 @@ import org.apache.log4j.Logger;
 /**
  * This program is a test client to upload files to a web server using HTTP POST.
  * Modify the endpoint URL as well as the path to the file for uploading.
- * 
+ *
  * @author dan179
  */
 public class FormFileUploaderClientApplication {
@@ -31,7 +41,7 @@ public class FormFileUploaderClientApplication {
 	private static Logger logger = null;
 
 	private static final String LOG4J_PROPERTIES_FILE = "tests.log4j.properties";
-	
+
 	static {
         File log4jProperties = new File(LOG4J_PROPERTIES_FILE); // looks to load test log4j properties file first.
         System.out.println(LOG4J_PROPERTIES_FILE + " -- File exists: " + log4jProperties.exists());
@@ -47,7 +57,7 @@ public class FormFileUploaderClientApplication {
 
 	/**
 	 * Run the program.
-	 * 
+	 *
 	 * @param args First argument is path to the file to analyze; second (optional) is path to server for overriding default value.
 	 */
 	public static void main(String[] args) {
@@ -57,7 +67,7 @@ public class FormFileUploaderClientApplication {
 			logger.error("===== Exiting Program =====");
 			System.exit(1);
 		}
-		
+
 		String filePath = args[0];
 		File uploadFile = new File(filePath);
 		if (!uploadFile.exists()) {
@@ -65,13 +75,13 @@ public class FormFileUploaderClientApplication {
 			logger.error("===== Exiting Program =====");
 			System.exit(1);
 		}
-		
+
 		if (args.length > 1) {
 			serverUrl = args[1];
 		}
 
 		logger.info("File to upload: " + filePath);
-		
+
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		try {
 			HttpPost httppost = new HttpPost(serverUrl);
@@ -92,7 +102,7 @@ public class FormFileUploaderClientApplication {
 					HttpEntity resEntity = response.getEntity();
 					InputStream is = resEntity.getContent();
 					BufferedReader in = new BufferedReader( new InputStreamReader( is ) );
-					
+
 					String output;
 					StringBuilder sb = new StringBuilder("Response data received:");
 					while ( (output = in.readLine()) != null ) {
