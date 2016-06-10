@@ -1,3 +1,13 @@
+//
+// Copyright (c) 2016 by The President and Fellows of Harvard College
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License. You may obtain a copy of the License at:
+// http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software distributed under the License is
+// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permission and limitations under the License.
+//
+
 package edu.harvard.hul.ois.fits.service.common;
 
 import static javax.servlet.http.HttpServletResponse.*;
@@ -25,11 +35,11 @@ public class ErrorMessage {
 
 	public ErrorMessage() {
 		super();
-	}	
-	
+	}
+
 	/**
 	 * Full constructor
-	 * 
+	 *
 	 * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html for status code and reason phrase
 	 * @param statusCode - the http status code as a String
 	 * @param message - the detailed error message
@@ -45,8 +55,8 @@ public class ErrorMessage {
 
 	/**
 	 * minimal constructor
-	 * This constructor sets the status to an internal error 
-	 * 
+	 * This constructor sets the status to an internal error
+	 *
 	 * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html for status code and reason phrase
 	 * @param statusCode - the http status code as a String
 	 * @param reasonPhrase - the http status line reasonPhrase
@@ -58,7 +68,7 @@ public class ErrorMessage {
 		this.message = message;
 		this.request = request;
 	}
-	
+
 	/**
 	 * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html for status code and reason phrase
 	 * @param statusCode - the http status code as a String
@@ -72,8 +82,8 @@ public class ErrorMessage {
 	}
 
 	/**
-	 * This constructor sets the status to an internal error 
-	 * 
+	 * This constructor sets the status to an internal error
+	 *
 	 * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html for status code and reason phrase
 	 * @param message - the detailed error message
 	 * @param request - the request URL
@@ -86,7 +96,7 @@ public class ErrorMessage {
 		this.support = support;
 	}
 
-	
+
 	public String getMessage() {
 		return message;
 	}
@@ -121,16 +131,16 @@ public class ErrorMessage {
 
 	public void setSupport(String support) {
 		this.support = support;
-	}	
-	
-	
+	}
+
+
 	/**
 	 * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html
 	 * @param statusCode
 	 * @return
 	 */
 	public String getReasonPhrase(int statusCode){
-		switch (statusCode) {		
+		switch (statusCode) {
 			case SC_CONTINUE            : return "Continue";
 			case SC_SWITCHING_PROTOCOLS : return "Switching Protocols";
 			case SC_OK                  : return "OK";
@@ -174,9 +184,9 @@ public class ErrorMessage {
 			default: return "Internal Server Error";
 		}
 	}
-	
-	
-	
+
+
+
 	/**
 	 * A convenience in case jaxb marshalling is not available
 	 */
@@ -187,17 +197,16 @@ public class ErrorMessage {
 				.append(statusCode)
 			.append("</statusCode>")
 			.append("<message>")
-				.append(message != null? message : "")			
+				.append(message != null? message : "")
 			.append("</message>")
 			.append("<request>")
-				.append(request != null? request : "")			
+				.append(request != null? request : "")
 			.append("</request>")
 			.append("<support>")
-				.append("[toString version]" + (support != null? support : ""))			
+				.append("[toString version]" + (support != null? support : ""))
 			.append("</support>")
 		.append("</error>");
 		return sb.toString();
 	}
-	
-}
 
+}
