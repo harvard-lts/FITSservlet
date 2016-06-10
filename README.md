@@ -47,18 +47,17 @@ See <a href="#test-client">below</a> for a Java test client example.
 
 ## <a name="tomcat"></a>Deploying to Tomcat 7 and Tomcat 8
 ### Add Entries to catalina.properties
-It’s necessary to add the location of the FITS directory to the file `$CATALINA_BASE/conf/catalina.properties` then add the FITS lib folder JAR files. (See example below.) 
+It’s necessary to add the location of the FITS home directory to the file `$CATALINA_BASE/conf/catalina.properties` then add the location of the FITS lib folder JAR files. (See example below.) 
 <br>1. Add the “fits.home” environment variable.
 <br>2. Add all “fits.home”/lib/ JAR files to the shared class loader classpath with a wildcard ‘*’ and the `${fits.home}` property substitution.
 **Note: Do NOT add any JAR files that are contained in any of the FITS lib/ subdirectories to this classpath entry. They are added programmatically at runtime by the application.**
 <br>3. (optional) Rather than using the default log4j.properties file located within the WAR file (which logs to a file within the Tomcat directory structure) it's possible to set up logging to point to an external log4j.properties file. Add a "log4j.configuration" property to catalina.properties pointing to this file. It can be either a full path or have the `file:` protocol at the beginning of the entry. This is managed by the class `edu.harvard.hul.ois.fits.service.listeners.LoggingConfigurator.java`.
 #### catalina.properties example
 Add the following to the bottom of the file:
-`fits.home=path/to/fits/home'` (note: no final slash in path)
-`shared.loader=${fits.home}/lib/*.jar
-log4j.configuration=/path/to/log4j.properties`
-or
-`log4j.configuration=file:/path/to/log4j.properties`
+- `fits.home=path/to/fits/home` (note: no final slash in path)
+- `shared.loader=${fits.home}/lib/*.jar`
+- `log4j.configuration=/path/to/log4j.properties` or `log4j.configuration=file:/path/to/log4j.properties` (optional -- to override using the default log4j.properties in the WEB-INF directory of the WAR file.) 
+
 #### Additional Information:
 **Class loading:** Within the WAR file’s META-INF directory is a Tomcat-specific file, context.xml. This file indicates to the Tomcat server to modify the Tomcat default class loader scheme for this application. The result is that, rather than load the WAR’s classes and JAR files first, classes on Tomcat’s shared classpath will be loaded first. This is critical given the nature of the custom class loaders used in FITS. (This file will be ignored if deploying to JBoss.)
 

@@ -1,11 +1,11 @@
 <?xml version="1.0" ?> 
-<project name="FITServlet" default="war">
+<project name="FITS Service" default="war">
 
 	<!--
-	     Compile classpath depends on finding an external fits.jar from FITS project.
+	     Compile classpath depends on finding an external fits.jar from the FITS project.
          The environment variable "fits_jar_location" can be set to point to the
-         location containing fits.jar. Alternatively, set the value for property "fits.jar.fallback.location"
-         in the following properties file.
+         directory containing fits.jar (or some version JAR such as fits-1.0.0.jar).
+         Alternatively, set the value for property "fits.jar.fallback.location" in the build.properties file.
 	 -->
 	<property file="build.properties" />
 	<property environment="env"/> <!-- access to environment properties -->
@@ -28,28 +28,61 @@
 	<property name="classes.dir"           location="WebContent/WEB-INF/classes" />
 	<property name="dist.dir"              location="dist" />
     
-    <target name="init" depends="clean">
-
-    	<!-- Location of possible FITS JAR file as set by environment variable. -->
-    	<fileset dir="${fits.jar.environment.location}" includes="*.jar" id="fits.jar.environment">
+    <target name="set-fits-jar-env-directory-exists">
+        <!-- Set property if the fits.jar fallback directory exists (before checking for JAR file). -->
+        <condition property="fits.jar.environment.location.exists">
+            <available file="${env.fits_jar_location}" type="dir"/>
+        </condition>
+    </target>
+    
+	<target name="set-fits-jar-location-by-env" if="fits.jar.environment.location.exists"
+		depends="set-fits-jar-env-directory-exists">
+		<!--
+		  Sets the count of fits JAR files found in (a possibly set) environment variable pointing to directory where file resides.
+		  (There should only be a single fits JAR file if this location exists.)
+		-->
+        <fileset dir="${fits.jar.environment.location}" includes="*.jar" id="fits.jar.environment">
             <filename regex="fits.*\.jar" /> <!-- regex takes into account version number in JAR file. -->
-    	</fileset>
-    	<!-- Set property indicating number of FITS JAR files at environment variable location. -->
-        <resourcecount refid="fits.jar.environment" property="environ.fits.jar.count" />
-
-        <!-- Location of possible FITS JAR file as set by fallback location as set in properties file. -->
+        </fileset>
+		<!-- The following can only be called if the refid has a valid 'dir' attribute value. Thus, the 'if' on this target. -->
+		<resourcecount refid="fits.jar.environment" property="environ.fits.jar.count" />
+	</target>
+	
+	<target name="set-fits-jar-fallback-directory-exists">
+		<!-- Set property if the fits.jar fallback directory exists (before checking for JAR file). -->
+	    <condition property="fits.jar.fallback.location.exists">
+	    	<available file="${fits.jar.fallback.location}" type="dir"/>
+	    </condition>
+	</target>
+    
+    <target name="set-fits-jar-location-by-fallback" if="fits.jar.fallback.location.exists" unless="fits.jar.environment.location.exists" 
+    	depends="set-fits-jar-fallback-directory-exists">
+        <!--
+            Directory of possible FITS JAR file as set by fallback location as set in build.properties file.
+            Only called if environment variable for fir JAR directory not set. Thus, the 'unless' on this target.
+            (There should only be a single fits JAR file if this location exists.)
+        -->
         <fileset dir="${fits.jar.fallback.location}" includes="*.jar" id="fits.jar.fallback">
             <filename regex="fits.*\.jar" /> <!-- regex takes into account version number in JAR file. -->
         </fileset>
         <!-- Set property indicating number of FITS JAR files at fallback location. -->
         <resourcecount refid="fits.jar.fallback" property="fallback.fits.jar.count" />
+    </target>
+    
+	<target name="init" depends="clean, set-fits-jar-location-by-env, set-fits-jar-location-by-fallback">
+
+    	<!-- Location of possible FITS JAR file as set by environment variable. -->
+    	<fileset dir="${fits.jar.environment.location}" includes="*.jar" id="fits.jar.environment">
+            <filename regex="fits.*\.jar" /> <!-- regex takes into account version number in JAR file. -->
+    	</fileset>
     	
-    	<!-- uncomment for property debugging information
+    	<!-- Property values for FITS JAR file dependency. -->
     	<echo message="fits.jar.environment.location: ${env.fits_jar_location}" />
-    	<echo message="fits.jar.fallback.location: ${fits.jar.fallback.location}" />
+        <echo message="fits.jar.environment.location.exists: ${fits.jar.environment.location.exists}" />
     	<echo message="fits JAR files in environment variable location: ${environ.fits.jar.count}" />
+    	<echo message="fits.jar.fallback.location: ${fits.jar.fallback.location}" />
+        <echo message="fits.jar.fallback.location.exists: ${fits.jar.fallback.location.exists}" />
         <echo message="fits JAR files in fallback location: ${fallback.fits.jar.count}" />
-    	-->
     	
     	<fail message="*** Either missing FITS JAR file or more than one is present. There should be one and only one FITS JAR file. Cannot build! ***">
     		<condition>
@@ -61,7 +94,16 @@
                 </not>
    			</condition>
    		</fail>
-    	
+
+		<!-- Set fits JAR file for use in comilation. -->
+        <condition property="fits.jar.file.dir" value="${fits.jar.environment.location}">
+            <equals arg1="${environ.fits.jar.count}" arg2="1" />
+        </condition>
+		<!-- Property cant be set a second time if set in the above condition. -->
+        <condition property="fits.jar.file.dir" value="${fits.jar.fallback.location}">
+            <equals arg1="${fallback.fits.jar.count}" arg2="1" />
+        </condition>
+		
     	<!-- Verify existance of version properties file containing the expected property. -->
     	<fail message="Cannot find file: ${build.version.file}">
     		<condition>
@@ -85,7 +127,7 @@
     </target>
     
     <target name="compile" depends="init" description="Compile all source code">
-        <javac destdir="${classes.dir}" debug="true" srcdir="${src.dirs}:${test.dirs}" includeantruntime="false" source="1.8" target="1.8">
+        <javac destdir="${classes.dir}" debug="true" srcdir="${src.dirs}:${test.dirs}" includeantruntime="false" source="1.7" target="1.7">
         	<classpath>
                 <fileset dir="WebContent/WEB-INF/lib">
                     <include name="*.jar" />
@@ -94,9 +136,9 @@
                 <fileset dir="lib">
                     <include name="*.jar" />
                 </fileset>
-        		<!-- Already determined that FITS JAR file will be in only one of the following two locations. -->
-        		<fileset refid="fits.jar.fallback" />
-                <fileset refid="fits.jar.environment" />
+        		<fileset dir="${fits.jar.file.dir}">
+        			<include name="*.jar"/>
+        		</fileset>
         	</classpath>
         </javac>
     </target>
