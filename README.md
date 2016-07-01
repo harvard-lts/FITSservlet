@@ -27,7 +27,7 @@ There are currently two services provided by the web applciation.
 Examining a file and returning corresponding metadata containing both FITS output and standard schema output in XML format. (See [FITS](http://fitstool.org) for more information.)
     Substitute 'examine' for `<endpoint>` (see above) plus add a 'file' parameter name with the path to the input file for a GET request or submit a POST request with form data with a 'file' parameter name containing the contents of the file as its payload.
 <br>Examples: 
-* GET: (using curl) `curl --get -k --data-binary file=path/to/file http://yourserver.yourdomain.com:<port>/fits/examine`
+* GET: (using curl) `curl -k -F file=@path/to/file http://yourserver.yourdomain.com:<port>/fits/examine`
 * GET: (using a browser) `http://yourserver.yourdomain.com:<port>/fits/examine?file=path/to/file`
 * POST: (using curl) `curl -k -F datafile file=path/to/file http://yourserver.yourdomain.com:<port>/fits/examine` ('datafile' is the required form parameter that points to the uploaded file.)
 * POST: (using a browser) `http://yourserver.yourdomain.com:<port>/fits/upload.jsp` (Select the file to upload then click the 'Upload' button.)
@@ -38,9 +38,9 @@ Obtaining the version of FITS being used to examine input files returned in plai
 * GET (using curl) `curl --get http://yourserver.yourdomain.com:<port>/fits/version`
 * GET (using a browser) `http://yourserver.yourdomain.com:<port>/fits/version`
 ### Web Interface
-There is also a web page with a form for uploading a file for FITS processing.
+There is also a web page with a form for uploading a file for FITS processing at the root of the application.
 It can be access from this URL:
-`http://yourserver.yourdomain.com:<port>/fits/upload.jsp`
+`http://yourserver.yourdomain.com:<port>/fits/`
 XML will be returned as a response.
 
 See <a href="#test-client">below</a> for a Java test client example.
