@@ -29,7 +29,7 @@ Examining a file and returning corresponding metadata containing both FITS outpu
 <br>Examples: 
 * GET: (using curl) `curl --get -k --data-binary file=path/to/file http://yourserver.yourdomain.com:<port>/fits/examine`
 * GET: (using a browser) `http://yourserver.yourdomain.com:<port>/fits/examine?file=path/to/file`
-* POST: (using curl) `curl -k -F file=@path/to/file http://yourserver.yourdomain.com:<port>/fits/examine` ('datafile' is the required form parameter that points to the uploaded file.)
+* POST: (using curl) `curl -k -F datafile=@path/to/file http://yourserver.yourdomain.com:<port>/fits/examine` ('datafile' is the required form parameter that points to the uploaded file.)
 * POST: (using a browser) `http://yourserver.yourdomain.com:<port>/fits/upload.jsp` (Select the file to upload then click the 'Upload' button.)
 
 #### 2. /version
@@ -37,9 +37,9 @@ Obtaining the version of FITS being used to examine input files returned in plai
 <br>Examples:
 * GET (using curl) `curl --get http://yourserver.yourdomain.com:<port>/fits/version`
 * GET (using a browser) `http://yourserver.yourdomain.com:<port>/fits/version`
+
 ### Web Interface
-There is also a web page with a form for uploading a file for FITS processing at the root of the application.
-It can be access from this URL:
+There is also a web page with a form for uploading a file for FITS processing at the root of the application. It can be access from this URL:
 `http://yourserver.yourdomain.com:<port>/fits/`
 XML will be returned as a response.
 
