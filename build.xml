@@ -147,6 +147,7 @@
     	<antcall target="create-manifest" />
     	<!-- Put logging configuration file into the classes directory -->
     	<copy file="WebContent/WEB-INF/log4j.properties" todir="${classes.dir}" />
+        <copy file="WebContent/WEB-INF/fits-service.properties" todir="${classes.dir}" />
         <war destfile="${dist.dir}/${war.name}" webxml="WebContent/WEB-INF/web.xml"
         	manifest="${manifest.dir}/${manifest.name}">
             <fileset dir="WebContent" />

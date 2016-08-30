@@ -10,21 +10,26 @@
 
 package edu.harvard.hul.ois.fits.service.servlets;
 
+import static edu.harvard.hul.ois.fits.service.common.Constants.ENV_PROJECT_PROPS;
 import static edu.harvard.hul.ois.fits.service.common.Constants.FITS_FILE_PARAM;
 import static edu.harvard.hul.ois.fits.service.common.Constants.FITS_FORM_FIELD_DATAFILE;
 import static edu.harvard.hul.ois.fits.service.common.Constants.FITS_HOME_SYSTEM_PROP_NAME;
 import static edu.harvard.hul.ois.fits.service.common.Constants.FITS_RESOURCE_PATH_VERSION;
+import static edu.harvard.hul.ois.fits.service.common.Constants.PROPERTIES_FILE_NAME;
 import static edu.harvard.hul.ois.fits.service.common.Constants.TEXT_HTML_MIMETYPE;
 import static edu.harvard.hul.ois.fits.service.common.Constants.TEXT_PLAIN_MIMETYPE;
 import static edu.harvard.hul.ois.fits.service.common.Constants.TEXT_XML_MIMETYPE;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -58,12 +63,20 @@ public class FitsServlet extends HttpServlet {
     private static String fitsHome = "";
 
     private static final String UPLOAD_DIRECTORY = "upload";
-    private static final int THRESHOLD_SIZE     = 1024 * 1024 * 3;  // 3MB
-    private static final int MAX_FILE_SIZE      = 1024 * 1024 * 40; // 40MB
-    private static final int MAX_REQUEST_SIZE   = 1024 * 1024 * 50; // 50MB
+	private static final int MIN_IDLE_OBJECTS_IN_POOL = 3;
+	private static final String DEFAULT_MAX_OBJECTS_IN_POOL = "10";
+	private static final String DEFAULT_MAX_UPLOAD_SIZE = "40";  // in MB
+	private static final String DEFAULT_MAX_REQUEST_SIZE = "50"; // in MB
+	private static final String DEFAULT_IN_MEMORY_FILE_SIZE = "3"; // in MB - above which the temporary file is stored to disk
+	private static final long MB_MULTIPLIER = 1024 * 1024;
+
     private static final Logger logger = Logger.getLogger(FitsServlet.class);
 
     private FitsWrapperPool fitsWrapperPool;
+	private Properties applicationProps = null;
+	private int maxInMemoryFileSizeMb;
+	private long maxFileUploadSizeMb;
+	private long maxRequestSizeMb;
 
     public void init() throws ServletException {
 
@@ -78,11 +91,60 @@ public class FitsServlet extends HttpServlet {
             throw new ServletException(FITS_HOME_SYSTEM_PROP_NAME + " system property HAS NOT BEEN SET!!! This web application will not properly run.");
         }
 
+        // Set the projects properties.
+		// First look for a system property pointing to a project properties file. (e.g. - file:/path/to/file)
+		// If this value either does not exist or is not valid, the default
+		// file that comes with this application will be used for initialization.
+		String environmentProjectPropsFile = System.getProperty(ENV_PROJECT_PROPS);
+		logger.info("Value of environment property: [ + ENV_PROJECT_PROPS + ] for finding external properties file in location: [" + environmentProjectPropsFile + "]");
+		if (environmentProjectPropsFile != null) {
+			logger.info("Will look for properties file from environment in location: [" + environmentProjectPropsFile + "]");
+			try {
+				File projectProperties = new File(environmentProjectPropsFile);
+				if (projectProperties.exists() && projectProperties.isFile() && projectProperties.canRead()) {
+					InputStream is = new FileInputStream(projectProperties);
+					applicationProps = new Properties();
+					applicationProps.load(is);
+				}
+			} catch (IOException e) {
+				// fall back to default file
+				logger.error("Unable to load properties file: [" + environmentProjectPropsFile + "] -- reason: " + e.getMessage(), e);
+				logger.error("Falling back to default project.properties file: [" + PROPERTIES_FILE_NAME + "]");
+				applicationProps = null;
+			}
+		}
+
+		if (applicationProps == null) { // did not load from environment variable location
+			try {
+				ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+				InputStream resourceStream = classLoader.getResourceAsStream(PROPERTIES_FILE_NAME);
+				if (resourceStream != null) {
+					applicationProps = new Properties();
+					applicationProps.load(resourceStream);
+					logger.info("loaded default applicationProps");
+				} else {
+					logger.warn("project.properties not found!!!");
+				}
+			} catch (IOException e) {
+				logger.error("Could not load properties file: [" + PROPERTIES_FILE_NAME + "]", e);
+				// couldn't load default properties so bail...
+				throw new ServletException("Couldn't load an applications properties file.", e);
+			}
+		}
+		int maxPoolSize = Integer.valueOf(applicationProps.getProperty("max.objects.in.pool", DEFAULT_MAX_OBJECTS_IN_POOL));
+		maxFileUploadSizeMb = Long.valueOf(applicationProps.getProperty("max.upload.file.size.MB", DEFAULT_MAX_UPLOAD_SIZE));
+		maxRequestSizeMb = Long.valueOf(applicationProps.getProperty("max.request.size.MB", DEFAULT_MAX_REQUEST_SIZE));
+		maxInMemoryFileSizeMb = Integer.valueOf(applicationProps.getProperty("max.in.memory.file.size.MB", DEFAULT_IN_MEMORY_FILE_SIZE));
+		logger.info("Max objects in object pool: " + maxPoolSize +
+				" -- Max file upload size: " +
+				maxFileUploadSizeMb +"MB -- Max request object size: " +
+				maxRequestSizeMb + "MB -- Max in-memory file size: " +
+				maxInMemoryFileSizeMb + "MB");
+
         logger.debug("Initializing FITS pool");
         GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
-        int numObjectsInPool = 5;
-        poolConfig.setMinIdle(numObjectsInPool);
-        poolConfig.setMaxTotal(numObjectsInPool);
+        poolConfig.setMinIdle(MIN_IDLE_OBJECTS_IN_POOL);
+        poolConfig.setMaxTotal(maxPoolSize);
         poolConfig.setTestOnBorrow(true);
         poolConfig.setBlockWhenExhausted(true);
         fitsWrapperPool = new FitsWrapperPool(new FitsWrapperFactory(), poolConfig);
@@ -155,12 +217,12 @@ public class FitsServlet extends HttpServlet {
 
         // configures upload settings
         DiskFileItemFactory factory = new DiskFileItemFactory();
-        factory.setSizeThreshold(THRESHOLD_SIZE);
+        factory.setSizeThreshold((maxInMemoryFileSizeMb * (int)MB_MULTIPLIER));
         factory.setRepository(new File(System.getProperty("java.io.tmpdir")));
 
         ServletFileUpload upload = new ServletFileUpload(factory);
-        upload.setFileSizeMax(MAX_FILE_SIZE);
-        upload.setSizeMax(MAX_REQUEST_SIZE);
+        upload.setFileSizeMax(maxFileUploadSizeMb * MB_MULTIPLIER);
+        upload.setSizeMax(maxRequestSizeMb * MB_MULTIPLIER);
 
         // constructs the directory path to store upload file & creates the directory if it does not exist
         String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIRECTORY;

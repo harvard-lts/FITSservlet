@@ -12,12 +12,28 @@ package edu.harvard.hul.ois.fits.service.common;
 
 public class Constants {
 
+	/** Environment variable for setting path to external application properties file */
+	public final static String ENV_PROJECT_PROPS = "FITS_SERVICE_PROPS";
+
+	/** Name of application properties file */
+	public final static String PROPERTIES_FILE_NAME = "fits-service.properties";
+
+	/** Resource path for processing an input file */
 	public final static String FITS_RESOURCE_PATH_EXAMINE = "/examine";
+
+	/** Resource path for obtaining the PDF/A Utility version (GET only) */
     public final static String FITS_RESOURCE_PATH_VERSION = "/version";
+
+	/** Form variable name for access to input file (POST) */
     public final static String FITS_FORM_FIELD_DATAFILE = "datafile";
+    
+    /** Request parameter name for pointing to input file (GET) */
+    public final static String FITS_FILE_PARAM = "file";
+    
+    /** Location of the FITS application home directory */
+    public final static String FITS_HOME_SYSTEM_PROP_NAME = "fits.home";
+
     public final static String TEXT_HTML_MIMETYPE = "text/html";
     public final static String TEXT_PLAIN_MIMETYPE = "text/plain";
     public final static String TEXT_XML_MIMETYPE = "text/xml";
-    public final static String FITS_FILE_PARAM = "file";
-    public final static String FITS_HOME_SYSTEM_PROP_NAME = "fits.home";
 }
