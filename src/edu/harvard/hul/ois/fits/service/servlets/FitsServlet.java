@@ -72,9 +72,10 @@ public class FitsServlet extends HttpServlet {
 
     private static final Logger logger = Logger.getLogger(FitsServlet.class);
 
+    private File uploadBaseDir; // base directory into which all uploaded files will be placed
     private FitsWrapperPool fitsWrapperPool;
 	private Properties applicationProps = null;
-	private int maxInMemoryFileSizeMb;
+	private int maxInMemoryFileSizeMb; // Uploaded files above this threshold will be placed in a temporary directory (separate from the upload dir) rather than kept in memory.
 	private long maxFileUploadSizeMb;
 	private long maxRequestSizeMb;
 
@@ -149,6 +150,13 @@ public class FitsServlet extends HttpServlet {
         poolConfig.setBlockWhenExhausted(true);
         fitsWrapperPool = new FitsWrapperPool(new FitsWrapperFactory(), poolConfig);
         logger.debug("FITS pool finished Initializing");
+
+        String uploadBaseDirName = getServletContext().getRealPath("") + File.separator + UPLOAD_DIRECTORY;
+        uploadBaseDir = new File(uploadBaseDirName);
+        if (!uploadBaseDir.exists()) {
+        	uploadBaseDir.mkdir();
+        	logger.info("Created upload base directory: " + uploadBaseDir.getAbsolutePath());
+        }
     }
 
     /**
@@ -171,7 +179,7 @@ public class FitsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         String servletPath = request.getServletPath(); // gives servlet mapping
-        logger.info("Entering doGet(): " + servletPath);
+        logger.debug("Entering doGet(): " + servletPath);
 
         // See if path is just requesting version number. If so, just return it.
         if (FITS_RESOURCE_PATH_VERSION.equals(servletPath)) {
@@ -185,10 +193,10 @@ public class FitsServlet extends HttpServlet {
         try {
             sendFitsExamineResponse(filePath, request, response);
         } catch (Exception e){
+            logger.error("Unexpected exception: " + e.getMessage(), e);
             ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     e.getMessage(),
-                    request.getRequestURL().toString(),
-                    e.getMessage());
+                    request.getRequestURL().toString());
             sendErrorMessageResponse(errorMessage, response);
         }
     }
@@ -206,10 +214,10 @@ public class FitsServlet extends HttpServlet {
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-    	logger.info("Entering doPost()");
+    	logger.debug("Entering doPost()");
         if (!ServletFileUpload.isMultipartContent(request)) {
             ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_BAD_REQUEST,
-                    " Missing Multipart Form Data. ",
+                    "Missing multipart POST form data.",
                     request.getRequestURL().toString());
             sendErrorMessageResponse(errorMessage, response);
             return;
@@ -218,50 +226,49 @@ public class FitsServlet extends HttpServlet {
         // configures upload settings
         DiskFileItemFactory factory = new DiskFileItemFactory();
         factory.setSizeThreshold((maxInMemoryFileSizeMb * (int)MB_MULTIPLIER));
-        factory.setRepository(new File(System.getProperty("java.io.tmpdir")));
+        String tempDir = System.getProperty("java.io.tmpdir");
+        logger.debug("Creating temp directory for storing uploaded files: " + tempDir);
+        factory.setRepository(new File(tempDir));
 
         ServletFileUpload upload = new ServletFileUpload(factory);
         upload.setFileSizeMax(maxFileUploadSizeMb * MB_MULTIPLIER);
         upload.setSizeMax(maxRequestSizeMb * MB_MULTIPLIER);
 
-        // constructs the directory path to store upload file & creates the directory if it does not exist
-        String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIRECTORY;
-        File uploadDir = new File(uploadPath);
-        if (!uploadDir.exists()) {
-            uploadDir.mkdir();
-        }
-
         try {
             List<FileItem> formItems = upload.parseRequest(request);
             Iterator<FileItem> iter = formItems.iterator();
+            
+            // file-specific directory path to store uploaded file
+            // ensures unique sub-directory to handle rare case of duplicate file name
+            String subDir = String.valueOf((new Date()).getTime());
+            String uploadPath = uploadBaseDir + File.separator + subDir;
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+            	uploadDir.mkdir();
+            }
 
-            // iterates over form's fields
+            // iterates over form's fields -- should only be one for uploaded file
             while (iter.hasNext()) {
                 FileItem item = iter.next();
-
-                // processes only fields that are not form fields
-                //if (!item.isFormField()) {
                 if (!item.isFormField() && item.getFieldName().equals(FITS_FORM_FIELD_DATAFILE)) {
 
-                    long fileSize = item.getSize();
-                    if (fileSize < 1) {
+                	String fileName = item.getName();
+                    if (StringUtils.isEmpty(fileName)) {
                         ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_BAD_REQUEST,
-                                " Missing File Data. ",
+                                "Missing File Data.",
                                 request.getRequestURL().toString());
                         sendErrorMessageResponse(errorMessage, response);
                         return;
                     }
                     // ensure a unique local fine name
-                    String fileSuffix = String.valueOf((new Date()).getTime());
-                    String fileNameAndPath = uploadPath + File.separator + "fits-" + fileSuffix + "-" + item.getName();
+                    String fileNameAndPath = uploadPath + File.separator + item.getName();
                     File storeFile = new File(fileNameAndPath);
                     item.write(storeFile); // saves the file on disk
 
                     if (!storeFile.exists()) {
                     	ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                                " Error in upload file.",
-                                request.getRequestURL().toString(),
-                                " Unspecified.");
+                                "Uploaded file does not exist.",
+                                request.getRequestURL().toString());
                         sendErrorMessageResponse(errorMessage, response);
                         return;
                     }
@@ -271,25 +278,30 @@ public class FitsServlet extends HttpServlet {
                         sendFitsExamineResponse(storeFile.getAbsolutePath(), request, response);
 
                     } catch (Exception e){
+                        logger.error("Unexpected exception: " + e.getMessage(), e);
                     	ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                                 e.getMessage(),
-                                request.getRequestURL().toString(),
-                                e.getMessage());
+                                request.getRequestURL().toString());
                         sendErrorMessageResponse(errorMessage, response);
                         return;
                     } finally {
                         // delete the uploaded file
-                        if(storeFile.delete()){
+                        if (storeFile.delete()){
                             logger.debug(storeFile.getName() + " is deleted!");
                         } else {
-                            logger.debug(storeFile.getName() + " could not be deleted!");
+                            logger.warn(storeFile.getName() + " could not be deleted!");
+                        }
+                        if (uploadDir.delete()) {
+                            logger.debug(uploadDir.getName() + " is deleted!");
+                        } else {
+                            logger.warn(uploadDir.getName() + " could not be deleted!");
                         }
                     }
                 } else {
                 	ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_BAD_REQUEST,
-                            " The request did not have the correct name attribute of \"datafile\" in the form processing. ",
+                            "The request did not have the correct name attribute of \"datafile\" in the form processing. ",
                             request.getRequestURL().toString(),
-                            " Processing halted.");
+                            "Processing halted.");
                     sendErrorMessageResponse(errorMessage, response);
                     return;
                 }
@@ -297,10 +309,11 @@ public class FitsServlet extends HttpServlet {
             }
 
         } catch (Exception ex) {
+            logger.error("Unexpected exception: " + ex.getMessage(), ex);
         	ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    " There was an unexpected server error. ",
+        			ex.getMessage(),
                     request.getRequestURL().toString(),
-                    " Processing halted.");
+                    "Processing halted.");
             sendErrorMessageResponse(errorMessage, response);
             return;
         }
@@ -310,7 +323,7 @@ public class FitsServlet extends HttpServlet {
 
           if (filePath == null) {
               ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_BAD_REQUEST,
-                      " Missing parameter: [" + FITS_FILE_PARAM + "] ",
+                      "Missing file parameter: [" + FITS_FILE_PARAM + "]",
                       req.getRequestURL().toString());
               sendErrorMessageResponse(errorMessage, resp);
               return;
@@ -319,7 +332,7 @@ public class FitsServlet extends HttpServlet {
           File file = new File(filePath);
           if (!file.exists()) {
               ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_BAD_REQUEST,
-                      " File not sent with request: " + file.getCanonicalPath(),
+                      " File not sent with request: " + file.getName(),
                       " " + req.getRequestURL().toString());
               sendErrorMessageResponse(errorMessage, resp);
               return;
@@ -327,7 +340,7 @@ public class FitsServlet extends HttpServlet {
 
           FitsWrapper fitsWrapper = null;
           try {
-              logger.debug("Borrowing fits from pool");
+              logger.debug("About to borrow FITS object from pool");
               fitsWrapper = fitsWrapperPool.borrowObject();
 
               logger.debug("Running FITS on " + file.getPath());
@@ -343,9 +356,9 @@ public class FitsServlet extends HttpServlet {
               out.println(outputString);
 
           } catch (Exception e){
-              logger.error("Unexpected exception: " + e.getLocalizedMessage(), e);
+              logger.error("Unexpected exception: " + e.getMessage(), e);
               ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                      " Fits examine failed",
+                      "Fits examine failed",
                       req.getRequestURL().toString(),
                       e.getMessage());
               sendErrorMessageResponse(errorMessage, resp);
@@ -366,9 +379,9 @@ public class FitsServlet extends HttpServlet {
               fitsWrapper = fitsWrapperPool.borrowObject();
               fitsVersion = fitsWrapper.getFits().VERSION;
           } catch (Exception e){
-              logger.error("Problem executing call...", e);
+              logger.error("Problem executing call: " + e.getMessage(), e);
               ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                      " Getting FITS version failed",
+                      "Getting FITS version failed",
                       req.getRequestURL().toString(),
                       e.getMessage());
               sendErrorMessageResponse(errorMessage, resp);
@@ -385,10 +398,8 @@ public class FitsServlet extends HttpServlet {
 
       private void sendErrorMessageResponse(ErrorMessage errorMessage,  HttpServletResponse resp) throws IOException {
           String errorMessageStr = errorMessageToString(errorMessage);
-          logger.error("Error -- Status:" + errorMessage.getStatusCode() + " - " +
-        		  errorMessage.getReasonPhrase() + ", " + errorMessage.getMessage());
           PrintWriter out = resp.getWriter();
-          resp.setContentType(TEXT_HTML_MIMETYPE);
+          resp.setContentType(TEXT_XML_MIMETYPE);
           resp.setStatus(errorMessage.getStatusCode());
           out.println(errorMessageStr);
       }
