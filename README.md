@@ -3,6 +3,8 @@ The FITS Service is a project that allows [FITS](http://fitstool.org) to be depl
 (It has been tested on Tomcat 7, Tomcat 8, and minimally tested on JBoss 7.1.)
 
 * <a href="#servlet-usage">FITS Web Service Usage Notes</a>
+    * <a href="#endpoints">Endpoints</a>
+    * <a href="#web-interface">Web Interface</a>
 * <a href="#tomcat">Deploying to Tomcat</a>
 * <a href="#jboss">Deploying to JBoss</a>
 * <a href="#ide-notes">IDE Notes</a>
@@ -21,8 +23,8 @@ Here is an example of the base URL for accessing this application without modifi
 Note: If you deploy the WAR file as fits-1.1.1.war (or whatever the version number happens to be then the URL examples contained here will need to contain `fits-1.1.1` instead of `fits`.
 The `<endpoint>` is one of the endpoints available within the FITS Service plus parameters to access the service. Rename to fits.war before deploying to use the following examples.
 
-### Endpoints
-There are currently two services provided by the web applciation.
+### <a name="endpoints"></a>Endpoints
+There are currently two services provided by the web application.
 #### 1. /examine
 Examining a file and returning corresponding metadata containing both FITS output and standard schema output in XML format. (See [FITS](http://fitstool.org) for more information.)
     Substitute 'examine' for `<endpoint>` (see above) plus add a 'file' parameter name with the path to the input file for a GET request or submit a POST request with form data with a 'file' parameter name containing the contents of the file as its payload.
@@ -30,7 +32,7 @@ Examining a file and returning corresponding metadata containing both FITS outpu
 * GET: (using curl) `curl --get -k --data-binary file=path/to/file http://yourserver.yourdomain.com:<port>/fits/examine`
 * GET: (using a browser) `http://yourserver.yourdomain.com:<port>/fits/examine?file=path/to/file`
 * POST: (using curl) `curl -k -F datafile=@path/to/file http://yourserver.yourdomain.com:<port>/fits/examine` ('datafile' is the required form parameter that points to the uploaded file.)
-* POST: (using a browser) `http://yourserver.yourdomain.com:<port>/fits/upload.jsp` (Select the file to upload then click the 'Upload' button.)
+* POST: (using a browser) `http://yourserver.yourdomain.com:<port>/fits/index.html` (Select the file to upload then click the 'Upload' button.)
 
 #### 2. /version
 Obtaining the version of FITS being used to examine input files returned in plain text format. (GET request only)
@@ -38,10 +40,10 @@ Obtaining the version of FITS being used to examine input files returned in plai
 * GET (using curl) `curl --get http://yourserver.yourdomain.com:<port>/fits/version`
 * GET (using a browser) `http://yourserver.yourdomain.com:<port>/fits/version`
 
-### Web Interface
+### <a name="web-interface"></a>Web Interface
 There is also a web page with a form for uploading a file for FITS processing at the root of the application. It can be access from this URL:
-`http://yourserver.yourdomain.com:<port>/fits/`
-XML will be returned as a response.
+`http://yourserver.yourdomain.com:<port>/fits/` (Optionally add `index.html`.)
+XML will be returned as a response when a file is properly handled (HTTP 200 response). Otherwise a text value with the HTTP response code and short explanation of the problem will be returned.
 
 See <a href="#test-client">below</a> for a Java test client example.
 
@@ -51,7 +53,9 @@ It’s necessary to add the location of the FITS home directory to the file `$CA
 <br>1. Add the “fits.home” environment variable.
 <br>2. Add all “fits.home”/lib/ JAR files to the shared class loader classpath with a wildcard ‘*’ and the `${fits.home}` property substitution.
 **Note: Do NOT add any JAR files that are contained in any of the FITS lib/ subdirectories to this classpath entry. They are added programmatically at runtime by the application.**
-<br>3. (optional) Rather than using the default log4j.properties file located within the WAR file (which logs to a file within the Tomcat directory structure) it's possible to set up logging to point to an external log4j.properties file. Add a "log4j.configuration" property to catalina.properties pointing to this file. It can be either a full path or have the `file:` protocol at the beginning of the entry. This is managed by the class `edu.harvard.hul.ois.fits.service.listeners.LoggingConfigurator.java`.
+<br>3. (optional) Rather than using the default log4j.properties file located within the WAR file here: /WebContent/WEB-INF/ (which logs to a file within the Tomcat directory structure) it's possible to set up logging to point to an external log4j.properties file. Add a "log4j.configuration" property to catalina.properties pointing to this file. It can be either a full path or have the `file:` protocol at the beginning of the entry. This is managed by the class `edu.harvard.hul.ois.fits.service.listeners.LoggingConfigurator.java`.
+<br>4. (optional) There are default configuration values for uploaded file located within the WAR file here: /WebContent/WEB-INF/fits-service.properties -- it's possible to set up these values externally. Add the property `FITS_SERVICE_PROPS` to catalina.properties pointing to a customized version of this file. Example:
+`FITS_SERVICE_PROPS=/path/to/fits-service.properties`
 #### catalina.properties example
 Add the following to the bottom of the file:
 - `fits.home=path/to/fits/home` (note: no final slash in path)
