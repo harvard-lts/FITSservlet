@@ -146,8 +146,8 @@
     <target name="war" depends="compile" description="Build the WAR file">
     	<antcall target="create-manifest" />
     	<!-- Put logging configuration file into the classes directory -->
-    	<copy file="WebContent/WEB-INF/log4j.properties" todir="${classes.dir}" />
-        <copy file="WebContent/WEB-INF/fits-service.properties" todir="${classes.dir}" />
+        <copy file="log4j.properties" todir="${classes.dir}" />
+        <copy file="fits-service.properties" todir="${classes.dir}" />
         <war destfile="${dist.dir}/${war.name}" webxml="WebContent/WEB-INF/web.xml"
         	manifest="${manifest.dir}/${manifest.name}">
             <fileset dir="WebContent" />
