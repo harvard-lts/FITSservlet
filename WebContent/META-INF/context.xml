@@ -1,8 +1,0 @@
-<Context crossContext="false">
-    <!--
-        From Tomcat 7 documentation: "Set to true if you want the class loader to follow the standard Java2 delegation model,
-        and attempt to load classes from parent class loaders before looking inside the web application."
-        Ref.: http://tomcat.apache.org/tomcat-7.0-doc/config/loader.html
-    -->
-    <Loader delegate="true"></Loader>
-</Context>
