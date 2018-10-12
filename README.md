@@ -50,11 +50,11 @@ See <a href="#test-client">below</a> for a Java test client example.
 ## <a name="tomcat"></a>Deploying to Tomcat 7 and Tomcat 8
 ### Add Entries to catalina.properties
 It’s necessary to add the location of the FITS home directory to the file `$CATALINA_BASE/conf/catalina.properties` then add the location of the FITS lib folder JAR files. (See example below.) 
-<br>1. Add the “fits.home” environment variable.
-<br>2. Add all “fits.home”/lib/ JAR files to the shared class loader classpath with a wildcard ‘*’ and the `${fits.home}` property substitution.
-**Note: Do NOT add any JAR files that are contained in any of the FITS lib/ subdirectories to this classpath entry. They are added programmatically at runtime by the application.**
-<br>3. (optional) Rather than using the default log4j.properties file located within the WAR file here: /WebContent/WEB-INF/ (which logs to a file within the Tomcat directory structure) it's possible to set up logging to point to an external log4j.properties file. Add a "log4j.configuration" property to catalina.properties pointing to this file. It can be either a full path or have the `file:` protocol at the beginning of the entry. This is managed by the class `edu.harvard.hul.ois.fits.service.listeners.LoggingConfigurator.java`.
-<br>4. (optional) There are default configuration values for uploaded file located within the WAR file here: /WebContent/WEB-INF/fits-service.properties -- it's possible to set up these values externally. Add the property `FITS_SERVICE_PROPS` to catalina.properties pointing to a customized version of this file. Example:
+<br>1. Add the `fits.home` property which points to the base of the FITS installation. Example: `fits.home=/path/to/fits-1.3.0`
+<br>2. Add the  FITS JAR files folder to the existing `shared.loader` classpath property using the `${fits.home}` property substitution. Example: `shared.loader=${fits.home}/lib/*.jar`
+**Notes: 1) This property MUST follow the `fits.home` property. 2) Do NOT add any of the JAR files that are contained in any of the FITS lib/ subdirectories to this classpath entry. They are added programmatically at runtime by the application.**
+<br>3. (optional) Rather than using the default log4j.properties file located within the WAR file here: `/src/main/resource/` (which logs to a file within the Tomcat directory structure) it's possible to set up logging to point to an external log4j.properties file. Add a "log4j.configuration" property to `catalina.properties` pointing to this file. It can be either a full path or have the `file:` protocol at the beginning of the entry. This is managed by the class `edu.harvard.hul.ois.fits.service.listeners.LoggingConfigurator.java`.
+<br>4. (optional) There are default configuration values for uploaded file located within the WAR file here: `/src/main/resource/fits-service.properties` -- it's possible to set up these values externally. Add the property `FITS_SERVICE_PROPS` to catalina.properties pointing to a customized version of this file. Example:
 `FITS_SERVICE_PROPS=/path/to/fits-service.properties`
 #### catalina.properties example
 Add the following to the bottom of the file:
