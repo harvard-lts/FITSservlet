@@ -21,7 +21,7 @@ public class Constants {
 	/** Resource path for processing an input file */
 	public final static String FITS_RESOURCE_PATH_EXAMINE = "/examine";
 
-	/** Resource path for obtaining the PDF/A Utility version (GET only) */
+	/** Resource path for obtaining the FITS version (GET only) */
     public final static String FITS_RESOURCE_PATH_VERSION = "/version";
 
 	/** Form variable name for access to input file (POST) */
@@ -29,6 +29,14 @@ public class Constants {
     
     /** Request parameter name for pointing to input file (GET) */
     public final static String FITS_FILE_PARAM = "file";
+    
+    /**
+     * Request parameter for including standard (content model) metadata output
+     * along with FITS metadata. Default if 'true'.
+     * Value <code>false</code> do not include standard output; otherwise 
+     * output is included (default).
+     */
+    public final static String INCLUDE_STANDARD_OUTPUT_PARAM = "includeStandardOutput";
     
     /** Location of the FITS application home directory */
     public final static String FITS_HOME_SYSTEM_PROP_NAME = "fits.home";

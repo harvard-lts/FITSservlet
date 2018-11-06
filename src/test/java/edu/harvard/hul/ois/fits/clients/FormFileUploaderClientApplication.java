@@ -37,7 +37,7 @@ import org.apache.log4j.Logger;
  * @author dan179
  */
 public class FormFileUploaderClientApplication {
-	private static String serverUrl = "http://localhost:8080/fits-1.1.0/examine"; // default value - override with args[1]
+	private static String serverUrl = "http://localhost:8080/fits/examine?includeStandardOutput="; // default value - override with args[1]
 	private static Logger logger = null;
 
 	private static final String LOG4J_PROPERTIES_FILE = "tests.log4j.properties";
@@ -84,9 +84,11 @@ public class FormFileUploaderClientApplication {
 
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		try {
-			HttpPost httppost = new HttpPost(serverUrl);
+			HttpPost httppost = new HttpPost(serverUrl+"false");
 			FileBody bin = new FileBody(uploadFile);
-			HttpEntity reqEntity = MultipartEntityBuilder.create().addPart(FITS_FORM_FIELD_DATAFILE, bin).build();
+			MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+			builder.addPart(FITS_FORM_FIELD_DATAFILE, bin);
+			HttpEntity reqEntity = builder.build();
 			httppost.setEntity(reqEntity);
 
 			logger.info("executing request " + httppost.getRequestLine());
@@ -104,10 +106,10 @@ public class FormFileUploaderClientApplication {
 					BufferedReader in = new BufferedReader( new InputStreamReader( is ) );
 
 					String output;
-					StringBuilder sb = new StringBuilder("Response data received:");
+					StringBuilder sb = new StringBuilder();
 					while ( (output = in.readLine()) != null ) {
-						sb.append(System.getProperty("line.separator"));
 						sb.append( output );
+						sb.append(System.getProperty("line.separator"));
 					}
 					logger.info(sb.toString());
 					in.close();

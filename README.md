@@ -33,7 +33,10 @@ Examining a file and returning corresponding metadata containing both FITS outpu
 * GET: (using a browser) `http://yourserver.yourdomain.com:<port>/fits/examine?file=path/to/file`
 * POST: (using curl) `curl -k -F datafile=@path/to/file http://yourserver.yourdomain.com:<port>/fits/examine` ('datafile' is the required form parameter that points to the uploaded file.)
 * POST: (using a browser) `http://yourserver.yourdomain.com:<port>/fits/index.html` (Select the file to upload then click the 'Upload' button.)
-
+##### a. Optional parameter
+The metadata that is returned contains "standard output" for the given content type within the `<metadata>` element by default. In order to disable this, the URL for both GET and POST requires an additional request parameter
+of `includeStandardOutput=false`. For example:
+`http://yourserver.yourdomain.com:<port>/fits/examine?includeStandardOutput=false&file=path/to/file`
 #### 2. /version
 Obtaining the version of FITS being used to examine input files returned in plain text format. (GET request only)
 <br>Examples:
@@ -60,7 +63,7 @@ It’s necessary to add the location of the FITS home directory to the file `$CA
 Add the following to the bottom of the file:
 - `fits.home=path/to/fits/home` (note: no final slash in path)
 - `shared.loader=${fits.home}/lib/*.jar`
-- `log4j.configuration=/path/to/log4j.properties` or `log4j.configuration=file:/path/to/log4j.properties` (optional -- to override using the default log4j.properties in the WEB-INF directory of the WAR file.) 
+- `log4j.configuration=/path/to/log4j.properties` or `log4j.configuration=file:/path/to/log4j.properties` (optional -- to override using the default log4j.properties in the WEB-INF/classes directory of the WAR file.) 
 
 #### Additional Information:
 **Class loading:** Within the WAR file’s META-INF directory is a Tomcat-specific file, context.xml. This file indicates to the Tomcat server to modify the Tomcat default class loader scheme for this application. The result is that, rather than load the WAR’s classes and JAR files first, classes on Tomcat’s shared classpath will be loaded first. This is critical given the nature of the custom class loaders used in FITS. (This file will be ignored if deploying to JBoss.)

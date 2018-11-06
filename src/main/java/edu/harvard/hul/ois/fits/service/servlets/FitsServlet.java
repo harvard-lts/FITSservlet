@@ -15,6 +15,7 @@ import static edu.harvard.hul.ois.fits.service.common.Constants.FITS_FILE_PARAM;
 import static edu.harvard.hul.ois.fits.service.common.Constants.FITS_FORM_FIELD_DATAFILE;
 import static edu.harvard.hul.ois.fits.service.common.Constants.FITS_HOME_SYSTEM_PROP_NAME;
 import static edu.harvard.hul.ois.fits.service.common.Constants.FITS_RESOURCE_PATH_VERSION;
+import static edu.harvard.hul.ois.fits.service.common.Constants.INCLUDE_STANDARD_OUTPUT_PARAM;
 import static edu.harvard.hul.ois.fits.service.common.Constants.PROPERTIES_FILE_NAME;
 import static edu.harvard.hul.ois.fits.service.common.Constants.TEXT_PLAIN_MIMETYPE;
 import static edu.harvard.hul.ois.fits.service.common.Constants.TEXT_XML_MIMETYPE;
@@ -25,9 +26,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.ServletException;
@@ -46,6 +49,7 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.apache.log4j.Logger;
 
 import edu.harvard.hul.ois.fits.FitsOutput;
+import edu.harvard.hul.ois.fits.service.common.Constants;
 import edu.harvard.hul.ois.fits.service.common.ErrorMessage;
 import edu.harvard.hul.ois.fits.service.pool.FitsWrapper;
 import edu.harvard.hul.ois.fits.service.pool.FitsWrapperFactory;
@@ -68,6 +72,7 @@ public class FitsServlet extends HttpServlet {
 	private static final String DEFAULT_MAX_REQUEST_SIZE = "50"; // in MB
 	private static final String DEFAULT_IN_MEMORY_FILE_SIZE = "3"; // in MB - above which the temporary file is stored to disk
 	private static final long MB_MULTIPLIER = 1024 * 1024;
+	private static final String FALSE = "false";
 
     private static final Logger logger = Logger.getLogger(FitsServlet.class);
 
@@ -188,9 +193,15 @@ public class FitsServlet extends HttpServlet {
 
         // Send it to the FITS processor...
         String filePath = request.getParameter(FITS_FILE_PARAM);
+        
+        boolean includeStdOutput = true; // include standard output by default
+        String includeStandardMetadata = request.getParameter(INCLUDE_STANDARD_OUTPUT_PARAM);
+        if (FALSE.equalsIgnoreCase(includeStandardMetadata)) {
+        	includeStdOutput = false;
+        }
 
         try {
-            sendFitsExamineResponse(filePath, request, response);
+            sendFitsExamineResponse(filePath, includeStdOutput, request, response);
         } catch (Exception e){
             logger.error("Unexpected exception: " + e.getMessage(), e);
             ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
@@ -236,6 +247,16 @@ public class FitsServlet extends HttpServlet {
         try {
             List<FileItem> formItems = upload.parseRequest(request);
             Iterator<FileItem> iter = formItems.iterator();
+            Map<String, String[]> paramMap = request.getParameterMap();
+            
+            boolean includeStdMetadata = true;
+            String[] vals = paramMap.get(Constants.INCLUDE_STANDARD_OUTPUT_PARAM);
+            if (vals != null && vals.length > 0) {
+            	if (FALSE.equalsIgnoreCase(vals[0])) {
+            		includeStdMetadata = false;
+            		logger.debug("flag includeStdMetadata set to : " + includeStdMetadata);
+            	}
+            }
             
             // file-specific directory path to store uploaded file
             // ensures unique sub-directory to handle rare case of duplicate file name
@@ -274,7 +295,7 @@ public class FitsServlet extends HttpServlet {
                     // Send it to the FITS processor...
                     try {
 
-                        sendFitsExamineResponse(storeFile.getAbsolutePath(), request, response);
+                        sendFitsExamineResponse(storeFile.getAbsolutePath(), includeStdMetadata, request, response);
 
                     } catch (Exception e){
                         logger.error("Unexpected exception: " + e.getMessage(), e);
@@ -318,7 +339,7 @@ public class FitsServlet extends HttpServlet {
         }
     }
 
-    private void sendFitsExamineResponse(String filePath, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    private void sendFitsExamineResponse(String filePath, boolean includeStdOutput, HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
           if (filePath == null) {
               ErrorMessage errorMessage = new ErrorMessage(HttpServletResponse.SC_BAD_REQUEST,
@@ -347,10 +368,13 @@ public class FitsServlet extends HttpServlet {
               // Start the output process
               ByteArrayOutputStream outStream = new ByteArrayOutputStream();
               FitsOutput fitsOutput = fitsWrapper.getFits().examine(file);
-              fitsOutput.addStandardCombinedFormat();
+              if (includeStdOutput) {
+            	  fitsOutput.addStandardCombinedFormat();
+              }
               fitsOutput.output(outStream);
               String outputString = outStream.toString();
               resp.setContentType(TEXT_XML_MIMETYPE);
+              resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
               PrintWriter out = resp.getWriter();
               out.println(outputString);
 
