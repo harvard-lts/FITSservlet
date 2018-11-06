@@ -1,6 +1,4 @@
+/target/
+/*.log
 # Mac OS X system file
 .DS_Store
-
-/bin
-/dist/
-/test.log
