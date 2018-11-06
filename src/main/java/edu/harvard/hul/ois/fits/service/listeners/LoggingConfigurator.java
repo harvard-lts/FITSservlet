@@ -11,8 +11,10 @@
 package edu.harvard.hul.ois.fits.service.listeners;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -41,6 +43,8 @@ public class LoggingConfigurator implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent ctx) {
 
+    	System.err.println("Attempting to set up log4j logging...");
+    	boolean useFallback = false;
         // Set up logging.
     	// Attempt to make it more robust.
     	// Log4j seems to want a valid URL for proper initialization.
@@ -64,15 +68,31 @@ public class LoggingConfigurator implements ServletContextListener {
                     // Even if set, reset logging System property to ensure it's in a URI format
                     // with scheme so the log4j framework can initialize.
                     System.setProperty( LOG4J_SYSTEM_PROPERTY, log4jUri.toString());
+                	System.err.print("Will look for log4j properties file here: " + log4jUri.toString());
                 }
             } catch (URISyntaxException e) {
                 // fall back to default file from WAR -- must first clear System property for this to work
                 System.err.println("Unable to load log4j.properties file: " + log4jSystemProp + " -- reason: " + e.getReason());
                 System.err.println("Falling back to default log4j.properties file from within WAR file.");
                 System.clearProperty(LOG4J_SYSTEM_PROPERTY);
+                useFallback = true;
             }
+        } else {
+        	System.err.println("No system property for [" + LOG4J_SYSTEM_PROPERTY + "] -- using default log4j.properties within WAR file");
+        	useFallback = true;
         }
-        // Else no external log4j.properties file then the default file from WAR will be used.
+        
+        if (useFallback) {
+        	try {
+				URL propFileURL = ctx.getServletContext().getResource("/WEB-INF/classes/log4j.properties");
+				log4jUri = propFileURL.toURI();
+                System.setProperty( LOG4J_SYSTEM_PROPERTY, log4jUri.toString());
+            	System.err.println("Look for log4j properties file in WAR here: " + log4jUri.toString());
+			} catch (MalformedURLException | URISyntaxException e) {
+				System.err.println("Could not access log4j.propertis in /WEB-INF/classes/");
+				e.printStackTrace();
+			}
+        }
     }
 
     @Override
