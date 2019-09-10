@@ -54,11 +54,11 @@
         	<!--
         		fits.jar should not be packaged into the WAR artifact but instead
         		be provided via classpath entry in Tomcat catalina.properties.
-        		Thus, the "provided" scope.
+        		Thus, the "provided" scope for compiler resolution.
         	-->
             <groupId>edu.harvard.huit.lts</groupId>
             <artifactId>fits</artifactId>
-            <version>1.4.0</version>
+            <version>1.5.0</version>
             <scope>provided</scope>
         </dependency>
 		<dependency>
