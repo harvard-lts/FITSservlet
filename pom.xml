@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>edu.harvard.huit.lts</groupId>
 	<artifactId>fits-service</artifactId>
-	<version>1.2.0</version>
+	<version>1.2.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 
 	<name>FITS Service</name>
@@ -54,11 +54,11 @@
         	<!--
         		fits.jar should not be packaged into the WAR artifact but instead
         		be provided via classpath entry in Tomcat catalina.properties.
-        		Thus, the "provided" scope.
+        		Thus, the "provided" scope for compiler resolution.
         	-->
             <groupId>edu.harvard.huit.lts</groupId>
             <artifactId>fits</artifactId>
-            <version>1.4.0</version>
+            <version>1.5.0</version>
             <scope>provided</scope>
         </dependency>
 		<dependency>
@@ -90,7 +90,7 @@
 		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
-			<version>1.3.1</version>
+			<version>1.3.3</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-lang</groupId>
