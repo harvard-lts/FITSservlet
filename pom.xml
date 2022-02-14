@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>edu.harvard.huit.lts</groupId>
 	<artifactId>fits-service</artifactId>
-	<version>1.2.1</version>
+	<version>1.2.2-SNAPSHOT</version>
 	<packaging>war</packaging>
 
 	<name>FITS Service</name>
@@ -26,8 +26,8 @@
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
-                    <showDeprecation>true</showDeprecation>
-                    <showWarnings>true</showWarnings>
+					<showDeprecation>true</showDeprecation>
+					<showWarnings>true</showWarnings>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -50,17 +50,23 @@
 		</plugins>
 	</build>
 	<dependencies>
-        <dependency>
-        	<!--
-        		fits.jar should not be packaged into the WAR artifact but instead
-        		be provided via classpath entry in Tomcat catalina.properties.
-        		Thus, the "provided" scope for compiler resolution.
-        	-->
-            <groupId>edu.harvard.huit.lts</groupId>
-            <artifactId>fits</artifactId>
-            <version>1.5.0</version>
-            <scope>provided</scope>
-        </dependency>
+		<dependency>
+			<!--
+				fits.jar should not be packaged into the WAR artifact but instead
+				be provided via classpath entry in Tomcat catalina.properties.
+				Thus, the "provided" scope for compiler resolution.
+			-->
+			<groupId>edu.harvard.huit.lts</groupId>
+			<artifactId>fits</artifactId>
+			<version>1.5.0</version>
+			<scope>provided</scope>
+			<exclusions>
+			 <exclusion>
+			        <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+			 </exclusion>
+			</exclusions>
+		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
@@ -98,9 +104,14 @@
 			<version>2.6</version>
 		</dependency>
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.17</version>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.17.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.17.1</version>
 		</dependency>
 		<!--
 			The following are necessary beginning with JDK 11 (or OpenJDK 11)

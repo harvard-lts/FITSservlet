@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+	<Appenders>
+		<Console name="STDOUT" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d %-5p - (%C{1}:%L) - %m%n" />
+		</Console>
+		<File name="FILEOUT" fileName="../logs/fits-service.log" append="true" immediateFlush="true">
+			<PatternLayout pattern="%d %-5p - (%C{1}:%L) - %m%n" />
+		</File>
+	</Appenders>
+	<Loggers>
+        <Logger name="edu.harvard.hul.ois.fits" level="info" />
+        <Logger name="edu.harvard.hul.ois.jhove" level="error" />
+        <Logger name="org.apache.tika" level="error" />
+		<Root level="info">
+			<AppenderRef ref="STDOUT" />
+            <AppenderRef ref="FILEOUT" />
+		</Root>
+	</Loggers>
+</Configuration>

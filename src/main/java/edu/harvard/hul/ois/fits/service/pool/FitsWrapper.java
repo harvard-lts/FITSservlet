@@ -14,7 +14,8 @@ import static edu.harvard.hul.ois.fits.service.common.Constants.FITS_HOME_SYSTEM
 
 import javax.servlet.ServletException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.harvard.hul.ois.fits.Fits;
 import edu.harvard.hul.ois.fits.exceptions.FitsException;
@@ -27,7 +28,7 @@ public class FitsWrapper {
 
 
     private static final String fitsHome = System.getProperty(FITS_HOME_SYSTEM_PROP_NAME);
-    private static Logger logger = Logger.getLogger(FitsWrapper.class);
+    private static Logger logger = LogManager.getLogger(FitsWrapper.class);
     private Fits fits;
 
     public FitsWrapper() throws ServletException {
