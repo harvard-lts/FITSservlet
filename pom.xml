@@ -13,13 +13,6 @@
 		<name>Harvard University</name>
 	</organization>
 
-	<scm>
-		<connection>scm:git:git@github.com:harvard-lts/FITSservlet.git</connection>
-		<developerConnection>scm:git:git@github.com:harvard-lts/FITSservlet.git</developerConnection>
-		<url>https://github.com/harvard-lts/FITSservlet</url>
-		<tag>HEAD</tag>
-	</scm>
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -69,8 +62,8 @@
 			<scope>provided</scope>
 			<exclusions>
 				<exclusion>
-					<groupId>log4j</groupId>
-					<artifactId>log4j</artifactId>
+				<groupId>log4j</groupId>
+				<artifactId>log4j</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
