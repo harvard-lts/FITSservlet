@@ -46,7 +46,8 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.harvard.hul.ois.fits.FitsOutput;
 import edu.harvard.hul.ois.fits.service.common.Constants;
@@ -74,7 +75,7 @@ public class FitsServlet extends HttpServlet {
 	private static final long MB_MULTIPLIER = 1024 * 1024;
 	private static final String FALSE = "false";
 
-    private static final Logger logger = Logger.getLogger(FitsServlet.class);
+    private static final Logger logger = LogManager.getLogger(FitsServlet.class);
 
     private File uploadBaseDir; // base directory into which all uploaded files will be placed
     private FitsWrapperPool fitsWrapperPool;
@@ -101,7 +102,7 @@ public class FitsServlet extends HttpServlet {
 		// If this value either does not exist or is not valid, the default
 		// file that comes with this application will be used for initialization.
 		String environmentProjectPropsFile = System.getProperty(ENV_PROJECT_PROPS);
-		logger.info("Value of environment property: [ + ENV_PROJECT_PROPS + ] for finding external properties file in location: [" + environmentProjectPropsFile + "]");
+		logger.info("Value of environment property: ["+ ENV_PROJECT_PROPS + "] for finding external properties file in location: [" + environmentProjectPropsFile + "]");
 		if (environmentProjectPropsFile != null) {
 			logger.info("Will look for properties file from environment in location: [" + environmentProjectPropsFile + "]");
 			try {
@@ -182,8 +183,9 @@ public class FitsServlet extends HttpServlet {
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+        String charEncoding = request.getCharacterEncoding();
         String servletPath = request.getServletPath(); // gives servlet mapping
-        logger.debug("Entering doGet(): " + servletPath);
+        logger.info("Entering doGet() - encoding + " + charEncoding + " -- URL: " + servletPath);
 
         // See if path is just requesting version number. If so, just return it.
         if (FITS_RESOURCE_PATH_VERSION.equals(servletPath)) {

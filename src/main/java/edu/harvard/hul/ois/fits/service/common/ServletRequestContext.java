@@ -18,7 +18,6 @@ import java.io.InputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.FileUploadBase;
-import edu.harvard.hul.ois.fits.service.common.UploadContext;
 
 /**
  * <p>Provides access to the request information needed for a request made to

@@ -28,7 +28,8 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * This program is a test client to upload files to a web server using HTTP POST.
@@ -40,19 +41,25 @@ public class FormFileUploaderClientApplication {
 	private static String serverUrl = "http://localhost:8080/fits/examine?includeStandardOutput="; // default value - override with args[1]
 	private static Logger logger = null;
 
-	private static final String LOG4J_PROPERTIES_FILE = "tests.log4j.properties";
+    /*
+     * This is the System property that the Log4j2 framework will use to configure its properties.
+     * It should reference a log4j2.xml file.
+     */
+    private static final String LOG4J_SYSTEM_PROPERTY = "log4j2.configurationFile";
 
-	static {
+    private static final String LOG4J_PROPERTIES_FILE = "log4j2.xml";
+
+    static {
         File log4jProperties = new File(LOG4J_PROPERTIES_FILE); // looks to load test log4j properties file first.
         System.out.println(LOG4J_PROPERTIES_FILE + " -- File exists: " + log4jProperties.exists());
         if (log4jProperties.exists()) {
-        	URI log4jUri = log4jProperties.toURI();
-        	System.setProperty("log4j.configuration", log4jUri.toString());
+            URI log4jUri = log4jProperties.toURI();
+        	System.setProperty(LOG4J_SYSTEM_PROPERTY, log4jUri.toString());
         }
-        String log4jProp = System.getProperty("log4j.configuration");
-        System.out.println("log4j.configuration: " + log4jProp);
-        // else should set log4j properties file from environment variable either in Eclipse of command line with -Dlog4j.configuration=<some location>
-        logger = Logger.getLogger(FormFileUploaderClientApplication.class);
+        String log4jProp = System.getProperty(LOG4J_SYSTEM_PROPERTY);
+        System.out.println("System property -- " + LOG4J_SYSTEM_PROPERTY + ": " + log4jProp);
+        // else should set log4j properties file from environment variable either in Eclipse of command line with -Dlog4j2.configurationFile=<some location>
+        logger = LogManager.getLogger(FormFileUploaderClientApplication.class);
     }
 
 	/**
