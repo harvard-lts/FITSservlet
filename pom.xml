@@ -175,8 +175,8 @@
 
 	<scm>
 		<connection>scm:git:git://github.com/harvard-lts/FITSservlet.git</connection>
-		<developerConnection>https://github.com/harvard-lts/FITSservlet.git</developerConnection>
-		<url>https://github.com/harvard-lts/FITSservlet/tree/master</url>
+		<developerConnection>scm:git:git://github.com/harvard-lts/FITSservlet.git</developerConnection>
+		<url>https://github.com/harvard-lts/FITSservlet</url>
 	</scm>
 
 	<licenses>
