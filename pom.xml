@@ -1,9 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>edu.harvard.huit.lts</groupId>
 	<artifactId>fits-service</artifactId>
-	<version>1.2.3-SNAPSHOT</version>
+	<version>1.2.4-SNAPSHOT</version>
 	<packaging>war</packaging>
 
 	<name>FITS Service</name>
@@ -177,7 +176,8 @@
 		<connection>scm:git:git://github.com/harvard-lts/FITSservlet.git</connection>
 		<developerConnection>scm:git:git://github.com/harvard-lts/FITSservlet.git</developerConnection>
 		<url>https://github.com/harvard-lts/FITSservlet</url>
-	</scm>
+	  <tag>HEAD</tag>
+  </scm>
 
 	<licenses>
 		<license>
