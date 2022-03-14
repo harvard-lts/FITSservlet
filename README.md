@@ -122,6 +122,31 @@ Within the WAR file’s WEB-INF directory is a JBoss-specific file, jboss-deploy
 
 Additional JBoss information can be found here: https://developer.jboss.org/thread/219956?tstart=0
 
+## Docker
+
+FITS servlet can also run from a Docker container. To build the Docker image, execute the following from the project
+root:
+
+```shell
+mvn -DskipTests clean package
+mvn dependency:copy-dependencies -DincludeArtifactIds=fits -DincludeTypes=zip
+docker build -f docker/Dockerfile -t fitsservlet .
+```
+
+This creates a local Docker image that runs the FITS servlet in Tomcat 9. The following is an example of how you might
+start the container:
+
+```shell
+docker run --rm -it -p 8080:8080 fitsservlet
+```
+
+This binds Tomcat to port `8080`, allowing you to navigate to the service in your browser at [http://localhost:8080](http://localhost:8080).
+
+You can change the servlet configuration by editing `docker/fits-service.properties` prior to building the image.
+
+Finally, the image exposes a volume, `/processing`, that can be attached to local storage. Then, you can instruct
+FITS to analyze files in the volume by executing a query like `http://localhost:8080/fits/examine?file=/processing/[PATH_TO_FILE]`.
+
 ## <a name="ide-notes"></a>IDE Notes 
 For Eclipse and other IDE's it will be necessary to resolve reference to classes in the FITS project. When adding this project to an IDE for development the FITS project should also be added and referenced. The Ant `build.xml` file will attempt to resolve an environment variable configured location for fits.jar, `fits_jar_location` or fallback to a default location as configured in `build.properties`. One of these two must be satisfied for a successful build. See the `build.xml` file for more details.
 At runtime in a server environment these references will be resolved via the Tomcat shared classpath or the JBoss module additions.
