@@ -16,7 +16,7 @@ FROM docker.io/tomcat:9-jre17-temurin-focal
 ARG FILE_VERSION=5.41
 
 RUN apt-get update && \
-    apt-get install -yqq make gcc unzip && \
+    apt-get install -yqq make gcc unzip nano vim less && \
     rm -rf /var/lib/apt/lists/*
 
 # Install file https://github.com/file/file
