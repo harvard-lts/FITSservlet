@@ -13,12 +13,13 @@ package edu.harvard.hul.ois.fits.service.pool;
 import org.apache.commons.pool2.BasePooledObjectFactory;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class FitsWrapperFactory extends BasePooledObjectFactory<FitsWrapper> {
 
-    private static Logger LOG = LogManager.getLogger(FitsWrapperFactory.class);
+    private static Logger LOG = LoggerFactory.getLogger(FitsWrapperFactory.class);
 
     @Override
     public FitsWrapper create() throws Exception {

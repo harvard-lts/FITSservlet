@@ -4,7 +4,10 @@
 #   # Build the image
 #   mvn -DskipTests clean package
 #   mvn dependency:copy-dependencies -DincludeArtifactIds=fits -DincludeTypes=zip
-#   docker build -f docker/Dockerfile -t fitsservlet .
+#   # Modify the following versions appropriately
+#   docker build -f docker/Dockerfile -t registry.lts.harvard.edu/lts/fits:1.5.5 .
+#   # If desired push this image to the registry
+#   docker push registry.lts.harvard.edu/lts/fits:1.5.5
 #
 #   # Run the service in the foreground
 #   docker run --rm -it -p 8080:8080 fitsservlet

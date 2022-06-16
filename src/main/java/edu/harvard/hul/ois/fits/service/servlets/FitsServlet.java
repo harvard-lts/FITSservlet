@@ -46,8 +46,8 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.harvard.hul.ois.fits.FitsOutput;
 import edu.harvard.hul.ois.fits.service.common.Constants;
@@ -75,7 +75,7 @@ public class FitsServlet extends HttpServlet {
 	private static final long MB_MULTIPLIER = 1024 * 1024;
 	private static final String FALSE = "false";
 
-    private static final Logger logger = LogManager.getLogger(FitsServlet.class);
+    private static final Logger logger = LoggerFactory.getLogger(FitsServlet.class);
 
     private File uploadBaseDir; // base directory into which all uploaded files will be placed
     private FitsWrapperPool fitsWrapperPool;
@@ -93,7 +93,7 @@ public class FitsServlet extends HttpServlet {
         logger.info(FITS_HOME_SYSTEM_PROP_NAME + ": " + fitsHome);
 
         if (StringUtils.isEmpty(fitsHome)) {
-            logger.fatal(FITS_HOME_SYSTEM_PROP_NAME + " system property HAS NOT BEEN SET!!! This web application will not properly run.");
+            logger.error(FITS_HOME_SYSTEM_PROP_NAME + " system property HAS NOT BEEN SET!!! This web application will not properly run.");
             throw new ServletException(FITS_HOME_SYSTEM_PROP_NAME + " system property HAS NOT BEEN SET!!! This web application will not properly run.");
         }
 
