@@ -14,7 +14,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<fits.version>1.5.2-SNAPSHOT</fits.version>
+		<fits.version>1.5.5</fits.version>
 	</properties>
 	
 	<build>
