@@ -28,8 +28,9 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 /**
  * This program is a test client to upload files to a web server using HTTP POST.
@@ -59,7 +60,7 @@ public class FormFileUploaderClientApplication {
         String log4jProp = System.getProperty(LOG4J_SYSTEM_PROPERTY);
         System.out.println("System property -- " + LOG4J_SYSTEM_PROPERTY + ": " + log4jProp);
         // else should set log4j properties file from environment variable either in Eclipse of command line with -Dlog4j2.configurationFile=<some location>
-        logger = LogManager.getLogger(FormFileUploaderClientApplication.class);
+        logger = LoggerFactory.getLogger(FormFileUploaderClientApplication.class);
     }
 
 	/**
