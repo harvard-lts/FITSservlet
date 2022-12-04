@@ -1,6 +1,6 @@
 # FITS Service
-The FITS Service is a project that allows [FITS](http://fitstool.org) to be deployed as a service on either Tomcat or JBoss. The project has been built with Java 8.
-(It has been tested on Tomcat 7, Tomcat 8, and minimally tested on JBoss 7.1.)
+The FITS Service is a project that allows [FITS](http://fitstool.org) to be deployed as a service on either Tomcat or JBoss.
+The project has been built with Java 11. (It has been tested on Tomcat 7, Tomcat 8, and minimally tested on JBoss 7.1.)
 
 * <a href="#servlet-usage">FITS Web Service Usage Notes</a>
     * <a href="#endpoints">Endpoints</a>
