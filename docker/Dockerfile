@@ -62,7 +62,7 @@ RUN unzip -q /opt/fits.zip -d /opt/fits && \
 
 # Install FITS Servlet into WebApps folder as ROOT.
 COPY target/fits-*.war $CATALINA_HOME/webapps/fits.war
-COPY docker/*.properties $CATALINA_HOME/conf
+COPY docker/*.properties $CATALINA_HOME/conf/
 RUN mkdir $CATALINA_HOME/webapps/ROOT && \
     echo '<% response.sendRedirect("/fits/"); %>' > $CATALINA_HOME/webapps/ROOT/index.jsp
 
