@@ -16,15 +16,10 @@ if [ $# -lt 1 ] ; then
     exit 1
 fi
 
-if [ $# -lt 2 ] ; then
-    echo "MISSING...2nd argument is the FITS version deployed to Maven repository to use for building the Docker image"
-    exit 1
-fi
-
 WAR_VERSION="$1"
-FITS_VERSION="$2"
+FITS_VERSION=1.6.0
 ARTIFACT_VERSION=`git rev-parse --short @`
-ARTIFACT_FINAL_NAME=registry.lts.harvard.edu/lts/fits-service-dev
+ARTIFACT_FINAL_NAME=registry.lts.harvard.edu/lts/fits-service
 
 echo ARTIFACT_VERSION: "$ARTIFACT_FINAL_NAME":"$ARTIFACT_VERSION"
 
@@ -51,9 +46,13 @@ fi
 
 docker build -f docker/Dockerfile -t "$ARTIFACT_FINAL_NAME":"$ARTIFACT_VERSION" .
 docker tag "$ARTIFACT_FINAL_NAME":"$ARTIFACT_VERSION" "$ARTIFACT_FINAL_NAME":"latest"
+docker tag "$ARTIFACT_FINAL_NAME":"$ARTIFACT_VERSION" "$ARTIFACT_FINAL_NAME":"$WAR_VERSION"
 
 echo "Pushing $ARTIFACT_FINAL_NAME:$ARTIFACT_VERSION"
 docker push "$ARTIFACT_FINAL_NAME":"$ARTIFACT_VERSION"
+
+echo "Pushing $ARTIFACT_FINAL_NAME:$WAR_VERSION"
+docker push "$ARTIFACT_FINAL_NAME":"$WAR_VERSION"
 
 echo "Pushing $ARTIFACT_FINAL_NAME:latest"
 docker push "$ARTIFACT_FINAL_NAME":"latest"
