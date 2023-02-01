@@ -129,7 +129,7 @@ root:
 
 ```shell
 mvn -DskipTests clean package
-mvn dependency:copy-dependencies -DincludeArtifactIds=fits -DincludeTypes=zip
+mvn dependency:get -DincludeArtifactIds=fits -DincludeTypes=zip
 docker build -f docker/Dockerfile -t fitsservlet .
 ```
 
