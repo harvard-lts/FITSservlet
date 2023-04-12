@@ -55,7 +55,7 @@ RUN cd /var/tmp && \
     rm -rf file-${FILE_VERSION}*
 
 # Install FITS
-COPY target/dependency/fits-*.zip /opt/fits.zip
+COPY target/fits-*.zip /opt/fits.zip
 RUN unzip -q /opt/fits.zip -d /opt/fits && \
     rm /opt/fits.zip && \
     mkdir -p /var/log/fits
