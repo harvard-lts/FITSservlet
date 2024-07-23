@@ -5,13 +5,4 @@
         Ref.: http://tomcat.apache.org/tomcat-7.0-doc/config/loader.html
     -->
     <Loader delegate="true"></Loader>
-    <Valve className="org.apache.catalina.valves.AccessLogValve"
-           directory="/proc/1/fd"
-           prefix="1"
-           suffix=""
-           fileDateFormat=""
-           pattern="%{yyyy-MM-dd HH:mm:ss.SSS Z}t %h &quot;%r&quot; %s %b"
-           buffered="false"
-           conditionUnless="heartbeat"
-           requestAttributesEnabled="true" />
 </Context>
