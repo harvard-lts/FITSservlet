@@ -145,7 +145,7 @@
 		<repository>
 			<id>maven-central</id>
 			<name>Maven repo</name>
-			<url>http://central.maven.org/maven2/</url>
+			<url>https://repo.maven.apache.org/maven2/</url>
 		</repository>
 		<repository>
 			<id>local-maven-repo</id>
@@ -155,9 +155,9 @@
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
-			<id>maven2-repository.dev.java.net</id>
+			<id>maven-central</id>
 			<name>Java.net Maven 2 Repository</name>
-			<url>http://central.maven.org/maven2/</url>
+			<url>https://repo.maven.apache.org/maven2/</url>
 		</pluginRepository>
 	</pluginRepositories>
 
