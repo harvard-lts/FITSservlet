@@ -129,7 +129,7 @@ root:
 
 ```shell
 mvn -DskipTests -Daether.connector.https.securityMode=insecure clean package
-mvn dependency:copy-dependencies -DincludeArtifactIds=fits -DincludeTypes=zip
+mvn dependency:copy-dependencies -Daether.connector.https.securityMode=insecure -DincludeArtifactIds=fits -DincludeTypes=zip
 docker build -f docker/Dockerfile -t fitsservlet .
 ```
 
