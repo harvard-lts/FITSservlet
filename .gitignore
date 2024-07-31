@@ -3,3 +3,4 @@
 # Mac OS X system file
 .DS_Store
 /.idea/
+.project

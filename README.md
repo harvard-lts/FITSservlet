@@ -128,8 +128,8 @@ FITS servlet can also run from a Docker container. To build the Docker image, ex
 root:
 
 ```shell
-mvn -DskipTests clean package
-mvn dependency:copy-dependencies -DincludeArtifactIds=fits -DincludeTypes=zip
+mvn -DskipTests -Daether.connector.https.securityMode=insecure clean package
+mvn dependency:copy-dependencies -Daether.connector.https.securityMode=insecure -DincludeArtifactIds=fits -DincludeTypes=zip
 docker build -f docker/Dockerfile -t fitsservlet .
 ```
 

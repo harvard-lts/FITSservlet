@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>edu.harvard.huit.lts</groupId>
 	<artifactId>fits-service</artifactId>
-	<version>2.2.0-SNAPSHOT</version>
+	<version>2.3.0-SNAPSHOT</version>
 	<packaging>war</packaging>
 
 	<name>FITS Service</name>
@@ -141,39 +141,21 @@
 		</dependency>
 	</dependencies>
 
-	<repositories>
-		<repository>
-			<id>maven-central</id>
-			<name>Maven repo</name>
-			<url>http://central.maven.org/maven2/</url>
-		</repository>
-		<repository>
-			<id>local-maven-repo</id>
-			<name>Local file system for temporarily holding non-repo JAR files</name>
-			<url>file://${project.basedir}/lib-local/</url>
-		</repository>
-	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>maven2-repository.dev.java.net</id>
-			<name>Java.net Maven 2 Repository</name>
-			<url>http://central.maven.org/maven2/</url>
-		</pluginRepository>
-	</pluginRepositories>
 
 	<distributionManagement>
 		<!-- repository URL and credentials set up in local .m2/settings.xml -->
 		<repository>
-			<id>harvard-lts-internal-release-repository</id>
+			<id>lts-maven</id>
 			<name>Harvard LTS internal Release Repository</name>
-			<url>${lts-artifactory-url}/lts-libs-release-local</url>
+			<url>${lts-artifactory-url}/lts-maven</url>
 		</repository>
 		<snapshotRepository>
-			<id>harvard-lts-internal-snapshot-repository</id>
+			<id>lts-maven</id>
 			<name>Harvard LTS internal Snapshot Repository</name>
-			<url>${lts-artifactory-url}/lts-libs-snapshot-local</url>
+			<url>${lts-artifactory-url}/lts-maven</url>
 		</snapshotRepository>
 	</distributionManagement>
+ 
 
 	<scm>
 		<connection>scm:git:git://github.com/harvard-lts/FITSservlet.git</connection>
