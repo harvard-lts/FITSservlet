@@ -10,7 +10,7 @@
 #   docker run --rm -it -p 8080:8080 fitsservlet
 #
 #   # Navigate to http://localhost:8080 in your browser
-FROM docker.io/tomcat:9-jre17-temurin-jammy
+FROM artifactory.huit.harvard.edu/lts/lts-tomcat-base:9-jdk17
 
 ARG FILE_VERSION=5.43
 ARG FILE_SHA256=8c8015e91ae0e8d0321d94c78239892ef9dbc70c4ade0008c0e95894abfb1991
