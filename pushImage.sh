@@ -1,7 +1,7 @@
 APP_NAME="fits-service"
  
 # Get the latest git hash
-VERSION=2.3.0
+VERSION=2.4.0
 echo "building fits-service version: $VERSION"
  
 # Build the image

@@ -15,8 +15,14 @@ FROM docker.io/tomcat:9.0.102-jre17-temurin-jammy
 ARG FILE_VERSION=5.43
 ARG FILE_SHA256=8c8015e91ae0e8d0321d94c78239892ef9dbc70c4ade0008c0e95894abfb1991
 
-RUN apt-get update && \
-    apt-get install -yqq \
+# Use HTTPS repositories for better connectivity and add timeout/retry options
+RUN sed -i 's|http://archive.ubuntu.com|https://archive.ubuntu.com|g' /etc/apt/sources.list && \
+    sed -i 's|http://security.ubuntu.com|https://security.ubuntu.com|g' /etc/apt/sources.list && \
+    echo 'Acquire::http::Timeout "30";' > /etc/apt/apt.conf.d/99timeout && \
+    echo 'Acquire::https::Timeout "30";' >> /etc/apt/apt.conf.d/99timeout && \
+    echo 'Acquire::Retries "3";' >> /etc/apt/apt.conf.d/99timeout && \
+    apt-get update && \
+    apt-get install -yqq --fix-missing \
     unzip nano vim less \
     # jpylyzer dependencies
     python3 \
@@ -32,7 +38,7 @@ RUN apt-get update && \
     libdigest-perl-md5-perl \
     libdigest-sha-perl \
     libposix-strptime-perl \
-    libunicode-linebreak-perl\
+    libunicode-linebreak-perl \
     # file dependencies
     make \
     gcc \
